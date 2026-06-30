@@ -157,7 +157,7 @@ function playTransition(canvas, targetLayout) {
     
     // Inject stylesheet inside SVG context to resolve correct font metrics
     const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-    style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@300;400&display=swap');`;
+    style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&display=swap');`;
     defs.appendChild(style);
 
     const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
@@ -312,11 +312,11 @@ function playTransition(canvas, targetLayout) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
       text.setAttribute('y', '128'); // Center line of the 256px logo height space
-      text.setAttribute('font-family', "'Inter', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '300'); // Inter Light
+      text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+      text.setAttribute('font-weight', '300'); // Oswald Light
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
-      text.setAttribute('letter-spacing', '-0.02em'); // Inter looks best with slightly tight tracking
+      text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
       text.setAttribute('alignment-baseline', 'middle');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
