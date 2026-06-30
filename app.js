@@ -345,14 +345,15 @@ function playTransition(canvas, targetLayout) {
       text.textContent = 'DATA WITHIN REACH';
       containerG.appendChild(text);
 
-      // Centering logic: calculate bounding box of the lockup content and center it inside the 1056x264 viewBox
+      // Auto-crop viewBox to wrap the bounding box tightly with a 16px safety padding (eliminates wasted canvas space)
       const bbox = containerG.getBBox();
-      if (bbox.width > 0) {
-        const targetX = (1056 - bbox.width) / 2;
-        const targetY = (264 - bbox.height) / 2;
-        const dx = targetX - bbox.x;
-        const dy = targetY - bbox.y;
-        containerG.setAttribute('transform', `translate(${dx}, ${dy})`);
+      if (bbox.width > 0 && bbox.height > 0) {
+        const pad = 16;
+        const vbX = bbox.x - pad;
+        const vbY = bbox.y - pad;
+        const vbW = bbox.width + pad * 2;
+        const vbH = bbox.height + pad * 2;
+        canvas.svg.setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
       }
     }
 
@@ -376,9 +377,13 @@ function exportPng(canvasObj, filename, targetWidth) {
   clone.style.backgroundColor = 'transparent';
   clone.setAttribute('shape-rendering', 'geometricPrecision');
   
-  const isLockup = canvasObj.id === 'text';
-  // Compute precise aspect ratio matching the exact viewBox dimensions (1056 / 264 = 4)
-  const aspect = isLockup ? 4 : 1;
+  // Retrieve the current live viewBox dimensions from the clone to calculate the exact aspect ratio dynamically
+  const viewBoxStr = clone.getAttribute('viewBox') || '0 0 264 264';
+  const parts = viewBoxStr.split(' ').map(Number);
+  const vbWidth = parts[2];
+  const vbHeight = parts[3];
+  const aspect = vbWidth / vbHeight;
+  
   const w = targetWidth;
   const h = Math.round(targetWidth / aspect);
   
