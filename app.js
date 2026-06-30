@@ -154,7 +154,7 @@ function playTransition(canvas, targetLayout) {
 
     // Determine viewBox & root elements
     const isLockup = canvas.id === 'text';
-    canvas.svg.setAttribute('viewBox', isLockup ? '-4 -4 1050 264' : '-4 -4 264 264');
+    canvas.svg.setAttribute('viewBox', isLockup ? '-4 -4 1056 264' : '-4 -4 264 264');
 
     // Setup Clipping Defs
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -345,10 +345,10 @@ function playTransition(canvas, targetLayout) {
       text.textContent = 'DATA WITHIN REACH';
       containerG.appendChild(text);
 
-      // Centering logic: calculate bounding box of the lockup content and center it inside the 1050x264 viewBox
+      // Centering logic: calculate bounding box of the lockup content and center it inside the 1056x264 viewBox
       const bbox = containerG.getBBox();
       if (bbox.width > 0) {
-        const targetX = (1050 - bbox.width) / 2;
+        const targetX = (1056 - bbox.width) / 2;
         const targetY = (264 - bbox.height) / 2;
         const dx = targetX - bbox.x;
         const dy = targetY - bbox.y;
@@ -377,8 +377,8 @@ function exportPng(canvasObj, filename, targetWidth) {
   clone.setAttribute('shape-rendering', 'geometricPrecision');
   
   const isLockup = canvasObj.id === 'text';
-  // Compute precise aspect ratio matching the exact viewBox dimensions (1054x268 vs 268x268)
-  const aspect = isLockup ? (1054 / 268) : 1;
+  // Compute precise aspect ratio matching the exact viewBox dimensions (1056 / 264 = 4)
+  const aspect = isLockup ? 4 : 1;
   const w = targetWidth;
   const h = Math.round(targetWidth / aspect);
   
