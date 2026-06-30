@@ -13,17 +13,17 @@ function getThemeColors() {
     return {
       white: '#121318', // deep charcoal background blocks
       black: '#dccaa0', // warm gold grid lines, borders, and text
-      red: '#ff3b30',   // vibrant neon red
-      blue: '#0a84ff',  // vibrant neon blue
-      yellow: '#ffd60a' // vibrant neon yellow
+      red: '#b30000',   // rich crimson red
+      blue: '#467181',  // slate blue
+      yellow: '#dda93e' // ochre yellow
     };
   } else {
     return {
       white: '#f5f5f7', // classic warm white blocks
       black: '#111112', // classic black borders/lines
-      red: '#e52521',
-      blue: '#0f52ba',
-      yellow: '#facd05'
+      red: '#b30000',   // rich crimson red
+      blue: '#467181',  // slate blue
+      yellow: '#dda93e' // ochre yellow
     };
   }
 }
