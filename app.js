@@ -157,9 +157,16 @@ function playTransition(canvas, targetLayout) {
     // Setup Clipping Defs
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     
-    // Inject stylesheet inside SVG context to resolve correct font metrics
+    // Inject base64 encoded stylesheet inside SVG context so the font renders inside isolated contexts (like canvas and image files)
     const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-    style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&display=swap');`;
+    style.textContent = `
+      @font-face {
+        font-family: 'Oswald';
+        font-style: normal;
+        font-weight: 300;
+        src: url(data:font/woff2;charset=utf-8;base64,${window.OSWALD_LIGHT_BASE64 || ''}) format('woff2');
+      }
+    `;
     defs.appendChild(style);
 
     const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
