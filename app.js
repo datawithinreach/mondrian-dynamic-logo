@@ -336,7 +336,22 @@ function playTransition(canvas, targetLayout) {
 
 // 3. Exporters
 function exportPng(canvasObj, filename, targetWidth) {
-  const svgString = new XMLSerializer().serializeToString(canvasObj.svg);
+  // Clone the SVG node so we can manipulate it for high-resolution serialization
+  const clone = canvasObj.svg.cloneNode(true);
+  
+  // Make the clone natively transparent
+  clone.style.backgroundColor = 'transparent';
+  
+  const isLockup = canvasObj.id === 'text';
+  const aspect = isLockup ? (1050 / 264) : 1;
+  const w = targetWidth;
+  const h = Math.round(targetWidth / aspect);
+  
+  // Set explicit dimensions on the SVG element so the browser rasterizes it at full size
+  clone.setAttribute('width', w);
+  clone.setAttribute('height', h);
+  
+  const svgString = new XMLSerializer().serializeToString(clone);
   const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
   const URL = window.URL || window.webkitURL || window;
   const blobURL = URL.createObjectURL(blob);
@@ -344,18 +359,12 @@ function exportPng(canvasObj, filename, targetWidth) {
   const image = new Image();
   image.onload = () => {
     const canvas = document.createElement('canvas');
-    const isLockup = canvasObj.id === 'text';
-    const aspect = isLockup ? (1050 / 264) : 1;
-    
-    const w = targetWidth;
-    const h = Math.round(targetWidth / aspect);
-    
     canvas.width = w;
     canvas.height = h;
     const context = canvas.getContext('2d');
     
-    context.fillStyle = getThemeColors().white;
-    context.fillRect(0, 0, w, h);
+    // Draw directly onto the transparent canvas context
+    context.clearRect(0, 0, w, h);
     context.drawImage(image, 0, 0, w, h);
     
     const pngURL = canvas.toDataURL('image/png');
@@ -365,12 +374,17 @@ function exportPng(canvasObj, filename, targetWidth) {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(blobURL);
   };
   image.src = blobURL;
 }
 
 function exportSvg(canvasObj, filename) {
-  const svgContent = canvasObj.svg.outerHTML;
+  // Clone the SVG node so we can strip the background style
+  const clone = canvasObj.svg.cloneNode(true);
+  clone.style.backgroundColor = 'transparent';
+  
+  const svgContent = clone.outerHTML;
   const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -412,7 +426,6 @@ function updateGlobalTheme(theme, clickedBtn) {
 
   ALL_CANVASES.forEach(canv => {
     canv.svg.parentElement.style.backgroundColor = colors.white;
-    canv.svg.style.backgroundColor = colors.white;
     if (canv.currentLayout) {
       playTransition(canv, canv.currentLayout);
     }
@@ -428,7 +441,9 @@ function init() {
   document.getElementById('btn-global-light').addEventListener('click', (e) => updateGlobalTheme('light', e.currentTarget));
   document.getElementById('btn-global-dark').addEventListener('click', (e) => updateGlobalTheme('dark', e.currentTarget));
 
+  const colors = getThemeColors();
   ALL_CANVASES.forEach(canv => {
+    canv.svg.parentElement.style.backgroundColor = colors.white;
     const initial = generateMondrianLayout();
     playTransition(canv, initial);
 
