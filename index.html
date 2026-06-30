@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Within Reach — Dynamic Identity</title>
+  <!-- Modern Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-text">Data Within Reach</div>
+      <div class="badge">Research Group</div>
+    </header>
+
+    <main class="main-content">
+      <!-- Left Column: Both Options Stacked -->
+      <div class="canvas-stack">
+        <!-- Option A Card -->
+        <div class="canvas-card">
+          <div class="card-header">
+            <h3>Option A: The Shifting Grid (Rectangular)</h3>
+            <span class="card-desc">Standard neoplastic block composition</span>
+          </div>
+          
+          <div class="canvas-frame">
+            <svg id="logo-svg" viewBox="0 0 256 256" width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+              <!-- Dynamic elements for Option A -->
+            </svg>
+          </div>
+          <div class="dimensions-label">256 × 256 px</div>
+          
+          <!-- Option A Specific Controls -->
+          <div class="card-actions">
+            <button id="btn-next" class="btn primary-btn btn-sm">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
+              </svg>
+              Next Layout
+            </button>
+            <button id="btn-autoplay" class="btn secondary-btn btn-sm">
+              <span class="pulse-indicator"></span>
+              Auto Play
+            </button>
+            <button id="btn-export-svg-a" class="btn outline-btn btn-sm" title="Download Vector SVG">
+              SVG
+            </button>
+            <button id="btn-export-png-a-256" class="btn outline-btn btn-sm">
+              PNG (256)
+            </button>
+            <button id="btn-export-png-a-1024" class="btn outline-btn btn-sm">
+              PNG (1024)
+            </button>
+          </div>
+        </div>
+
+        <!-- Option B Card -->
+        <div class="canvas-card">
+          <div class="card-header">
+            <h3>Option B: Rhombus Logo</h3>
+            <span class="card-desc">Neoplastic composition clipped to a diamond outline</span>
+          </div>
+
+          <div class="canvas-frame">
+            <svg id="logo-svg-b" viewBox="0 0 256 256" width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+              <!-- Dynamic elements for Option B -->
+            </svg>
+          </div>
+          <div class="dimensions-label">256 × 256 px</div>
+
+          <!-- Option B Specific Controls -->
+          <div class="card-actions">
+            <button id="btn-next-b" class="btn primary-btn btn-sm">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
+              </svg>
+              Next Layout
+            </button>
+            <button id="btn-autoplay-b" class="btn secondary-btn btn-sm">
+              <span class="pulse-indicator"></span>
+              Auto Play
+            </button>
+            <button id="btn-export-svg-b" class="btn outline-btn btn-sm" title="Download Vector SVG">
+              SVG
+            </button>
+            <button id="btn-export-png-b-256" class="btn outline-btn btn-sm">
+              PNG (256)
+            </button>
+            <button id="btn-export-png-b-1024" class="btn outline-btn btn-sm">
+              PNG (1024)
+            </button>
+          </div>
+        </div>
+
+        <!-- Option C Card -->
+        <div class="canvas-card">
+          <div class="card-header">
+            <h3>Option C: Circular Logo</h3>
+            <span class="card-desc">Neoplastic composition clipped to a circular boundary</span>
+          </div>
+
+          <div class="canvas-frame">
+            <svg id="logo-svg-c" viewBox="0 0 256 256" width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+              <!-- Dynamic elements for Option C -->
+            </svg>
+          </div>
+          <div class="dimensions-label">256 × 256 px</div>
+
+          <!-- Option C Specific Controls -->
+          <div class="card-actions">
+            <button id="btn-next-c" class="btn primary-btn btn-sm">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
+              </svg>
+              Next Layout
+            </button>
+            <button id="btn-autoplay-c" class="btn secondary-btn btn-sm">
+              <span class="pulse-indicator"></span>
+              Auto Play
+            </button>
+            <button id="btn-export-svg-c" class="btn outline-btn btn-sm" title="Download Vector SVG">
+              SVG
+            </button>
+            <button id="btn-export-png-c-256" class="btn outline-btn btn-sm">
+              PNG (256)
+            </button>
+            <button id="btn-export-png-c-1024" class="btn outline-btn btn-sm">
+              PNG (1024)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Info & Project description -->
+      <section class="control-panel">
+        <h1>Generative Identity</h1>
+        <p class="description">
+          A dynamic logo design project inspired by Piet Mondrian's neoplasticism. Consisting of shifting structures representing fluid data patterns and connections brought within reach.
+        </p>
+
+        <div class="concept-details">
+          <div class="concept-point">
+            <strong>Option A (Rectangular)</strong>
+            <p>Standard rectangular grid structure containing dynamic color-block shifts.</p>
+          </div>
+          <div class="concept-point" style="margin-top: 1rem;">
+            <strong>Option B (Rhombus Logo)</strong>
+            <p>A diamond geometric composition containing horizontal and vertical grids. Clean, modern geometric badge style.</p>
+          </div>
+          <div class="concept-point" style="margin-top: 1rem;">
+            <strong>Option C (Circular Logo)</strong>
+            <p>A circular badge style where neoplastic cells are constrained inside a perfect loop. Extremely premium visual identity.</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        
+        <div class="usage-instructions">
+          <h2>Usage Guide</h2>
+          <ul>
+            <li>Click <strong>Next Layout</strong> on any version to trigger animated grid shifts.</li>
+            <li>Enable <strong>Auto Play</strong> to run them as ambient screen savers.</li>
+            <li>Export as <strong>SVG</strong> for papers (vector format) or high-res **PNG** for slides.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>&copy; 2026 Data Within Reach Research Group. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
