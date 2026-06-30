@@ -245,7 +245,7 @@ function playTransition(canvas, targetLayout) {
           line.setAttribute('x2', l.val);
           line.setAttribute('y2', currentEnd);
         }
-        const currentStrokeWidth = isLockup ? 12 : STROKE_WIDTH;
+        const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
         line.setAttribute('stroke', themeColors.black);
         line.setAttribute('stroke-width', currentStrokeWidth);
         line.setAttribute('stroke-linecap', 'butt');
@@ -285,7 +285,7 @@ function playTransition(canvas, targetLayout) {
         border.setAttribute('stroke-dasharray', perimeter);
         border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
       }
-      const currentStrokeWidth = isLockup ? 12 : STROKE_WIDTH;
+      const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
       border.setAttribute('fill', 'none');
       border.setAttribute('stroke', themeColors.black);
       border.setAttribute('stroke-width', currentStrokeWidth);
@@ -306,11 +306,11 @@ function playTransition(canvas, targetLayout) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
       text.setAttribute('y', '128'); // Center line of the 256px logo
-      text.setAttribute('font-family', "'Fira Sans', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '500'); // Sleek medium weight
+      text.setAttribute('font-family', "'Bebas Neue', -apple-system, sans-serif");
+      text.setAttribute('font-weight', '400'); // Bebas Neue is regular weight but bold visually
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
-      text.setAttribute('letter-spacing', '-0.01em'); // Fira Sans looks best with tight geometric tracking
+      text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
       text.setAttribute('dominant-baseline', 'central');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
