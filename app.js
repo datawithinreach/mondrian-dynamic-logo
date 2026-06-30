@@ -37,7 +37,7 @@ const canvOnly = {
   btnNext: document.getElementById('btn-next-only'),
   btnAutoplay: document.getElementById('btn-autoplay-only'),
   btnExportSvg: document.getElementById('btn-export-svg-only'),
-  btnExportPng256: document.getElementById('btn-export-png-only-256'),
+  btnExportPng512: document.getElementById('btn-export-png-only-512'),
   btnExportPng1024: document.getElementById('btn-export-png-only-1024'),
   btnExportPng2048: document.getElementById('btn-export-png-only-2048'),
   currentLayout: null,
@@ -52,7 +52,7 @@ const canvText = {
   btnNext: document.getElementById('btn-next-text'),
   btnAutoplay: document.getElementById('btn-autoplay-text'),
   btnExportSvg: document.getElementById('btn-export-svg-text'),
-  btnExportPng256: document.getElementById('btn-export-png-text-256'),
+  btnExportPng512: document.getElementById('btn-export-png-text-512'),
   btnExportPng1024: document.getElementById('btn-export-png-text-1024'),
   btnExportPng2048: document.getElementById('btn-export-png-text-2048'),
   currentLayout: null,
@@ -568,9 +568,9 @@ function init() {
       const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
       exportSvg(canv, `data_within_reach_${suffix}.svg`);
     });
-    canv.btnExportPng256.addEventListener('click', () => {
+    canv.btnExportPng512.addEventListener('click', () => {
       const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
-      exportPng(canv, `data_within_reach_${suffix}_256.png`, 256);
+      exportPng(canv, `data_within_reach_${suffix}_512.png`, 512);
     });
     canv.btnExportPng1024.addEventListener('click', () => {
       const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
