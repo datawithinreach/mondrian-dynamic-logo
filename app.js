@@ -61,7 +61,22 @@ const canvText = {
   isAutoplay: false
 };
 
-const ALL_CANVASES = [canvOnly, canvText];
+const canvMonogram = {
+  id: 'monogram',
+  svg: document.getElementById('preview-logo-monogram'),
+  btnNext: document.getElementById('btn-next-monogram'),
+  btnAutoplay: document.getElementById('btn-autoplay-monogram'),
+  btnExportSvg: document.getElementById('btn-export-svg-monogram'),
+  btnExportPng512: document.getElementById('btn-export-png-monogram-512'),
+  btnExportPng1024: document.getElementById('btn-export-png-monogram-1024'),
+  btnExportPng2048: document.getElementById('btn-export-png-monogram-2048'),
+  currentLayout: null,
+  animId: null,
+  autoplayInt: null,
+  isAutoplay: false
+};
+
+const ALL_CANVASES = [canvOnly, canvText, canvMonogram];
 
 // 1. Recursive Subdivision Generator
 function generateMondrianLayout() {
@@ -357,6 +372,41 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
+    // E. If monogram, render centered uppercase monogram "DWR" with crisp drop shadow (dx=2, dy=2)
+    if (canvas.id === 'monogram') {
+      const isDark = currentTheme === 'dark';
+      const shadowColor = isDark ? '#121318' : '#ffffff';
+      const frontColor = isDark ? '#dccaa0' : '#111112';
+
+      // 1. Draw drop shadow text first (offset by dx=2, dy=2)
+      const shadowText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      shadowText.setAttribute('x', '130'); // 128 + 2
+      shadowText.setAttribute('y', '128'); // 128 + 2
+      shadowText.setAttribute('dy', '10'); // 8 + 2 vertical offset
+      shadowText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+      shadowText.setAttribute('font-weight', '300'); // Oswald Light
+      shadowText.setAttribute('font-size', '110'); // Fitted size
+      shadowText.setAttribute('fill', shadowColor);
+      shadowText.setAttribute('text-anchor', 'middle');
+      shadowText.setAttribute('alignment-baseline', 'middle');
+      shadowText.textContent = 'DWR';
+      canvas.svg.appendChild(shadowText);
+
+      // 2. Draw front text
+      const frontText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      frontText.setAttribute('x', '128');
+      frontText.setAttribute('y', '128');
+      frontText.setAttribute('dy', '8');
+      frontText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+      frontText.setAttribute('font-weight', '300'); // Oswald Light
+      frontText.setAttribute('font-size', '110');
+      frontText.setAttribute('fill', frontColor);
+      frontText.setAttribute('text-anchor', 'middle');
+      frontText.setAttribute('alignment-baseline', 'middle');
+      frontText.textContent = 'DWR';
+      canvas.svg.appendChild(frontText);
+    }
+
     if (progress < 1) {
       canvas.animId = requestAnimationFrame(renderFrame);
     } else {
@@ -565,19 +615,19 @@ function init() {
     });
 
     canv.btnExportSvg.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
+      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
       exportSvg(canv, `data_within_reach_${suffix}.svg`);
     });
     canv.btnExportPng512.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
+      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
       exportPng(canv, `data_within_reach_${suffix}_512.png`, 512);
     });
     canv.btnExportPng1024.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
+      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
       exportPng(canv, `data_within_reach_${suffix}_1024.png`, 1024);
     });
     canv.btnExportPng2048.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
+      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
       exportPng(canv, `data_within_reach_${suffix}_2048.png`, 2048);
     });
   });
