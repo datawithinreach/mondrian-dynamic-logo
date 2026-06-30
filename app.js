@@ -307,16 +307,16 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // D. If lockup, render aligned wordmark text (font-size 76, centered vertically using dominant-baseline="central")
+    // D. If lockup, render aligned wordmark text (font-size 76, centered vertically using alignment-baseline="middle")
     if (isLockup) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
       text.setAttribute('y', '128'); // Center line of the 256px logo height space
-      text.setAttribute('font-family', "'Antonio', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '300'); // Antonio Light
+      text.setAttribute('font-family', "'Inter', -apple-system, sans-serif");
+      text.setAttribute('font-weight', '300'); // Inter Light
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
-      text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
+      text.setAttribute('letter-spacing', '-0.02em'); // Inter looks best with slightly tight tracking
       text.setAttribute('alignment-baseline', 'middle');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
