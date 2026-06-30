@@ -304,11 +304,11 @@ function playTransition(canvas, targetLayout) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
       text.setAttribute('y', '152');
-      text.setAttribute('font-family', "'Inter', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '900');
+      text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+      text.setAttribute('font-weight', '700');
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
-      text.setAttribute('letter-spacing', '-0.025em');
+      text.setAttribute('letter-spacing', '0.01em');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
     }
