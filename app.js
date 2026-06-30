@@ -150,7 +150,7 @@ function playTransition(canvas, targetLayout) {
 
     // Determine viewBox & root elements
     const isLockup = canvas.id === 'text';
-    canvas.svg.setAttribute('viewBox', isLockup ? '-4 -4 800 264' : '-4 -4 264 264');
+    canvas.svg.setAttribute('viewBox', isLockup ? '-4 -4 1050 264' : '-4 -4 264 264');
 
     // Setup Clipping Defs
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -335,7 +335,7 @@ function exportPng(canvasObj, filename, targetWidth) {
   image.onload = () => {
     const canvas = document.createElement('canvas');
     const isLockup = canvasObj.id === 'text';
-    const aspect = isLockup ? (800 / 264) : 1;
+    const aspect = isLockup ? (1050 / 264) : 1;
     
     const w = targetWidth;
     const h = Math.round(targetWidth / aspect);

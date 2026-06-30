@@ -99,17 +99,17 @@
           <span class="card-desc">Ideal for avatars, icons, and page margins</span>
         </div>
         
-        <div class="card-body-row">
-          <!-- Logo Display -->
+        <div class="card-body-stacked">
+          <!-- Row 1: Logo Display -->
           <div class="preview-logo-frame only">
             <svg id="preview-logo-only" viewBox="-4 -4 264 264" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
               <!-- Dynamic logo here -->
             </svg>
           </div>
           
-          <!-- Actions & Info -->
-          <div class="preview-actions-panel">
-            <div class="action-buttons-group">
+          <!-- Row 2: Action & Export Bar -->
+          <div class="preview-actions-bar">
+            <div class="btn-group-row">
               <button id="btn-next-only" class="btn primary-btn btn-sm">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
@@ -122,9 +122,9 @@
               </button>
             </div>
             
-            <div class="divider-thin"></div>
+            <div class="divider-vertical"></div>
             
-            <div class="export-buttons-group">
+            <div class="export-group-row">
               <span class="export-label">Export:</span>
               <button id="btn-export-svg-only" class="btn outline-btn btn-sm">SVG</button>
               <button id="btn-export-png-only-256" class="btn outline-btn btn-sm">PNG (256)</button>
@@ -141,17 +141,17 @@
           <span class="card-desc">Full brand lockup for presentations, documents, and banners</span>
         </div>
         
-        <div class="card-body-row">
-          <!-- Logo + Text SVG Display -->
+        <div class="card-body-stacked">
+          <!-- Row 1: Logo + Text SVG Display (viewBox expanded to 1050 to prevent cut-off) -->
           <div class="preview-logo-frame lockup">
-            <svg id="preview-logo-text" viewBox="-4 -4 800 264" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg id="preview-logo-text" viewBox="-4 -4 1050 264" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
               <!-- Lockup dynamic logo & text here -->
             </svg>
           </div>
           
-          <!-- Actions & Info -->
-          <div class="preview-actions-panel">
-            <div class="action-buttons-group">
+          <!-- Row 2: Action & Export Bar -->
+          <div class="preview-actions-bar">
+            <div class="btn-group-row">
               <button id="btn-next-text" class="btn primary-btn btn-sm">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
@@ -164,9 +164,9 @@
               </button>
             </div>
             
-            <div class="divider-thin"></div>
+            <div class="divider-vertical"></div>
             
-            <div class="export-buttons-group">
+            <div class="export-group-row">
               <span class="export-label">Export:</span>
               <button id="btn-export-svg-text" class="btn outline-btn btn-sm">SVG</button>
               <button id="btn-export-png-text-256" class="btn outline-btn btn-sm">PNG (256)</button>
