@@ -301,17 +301,16 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // D. If lockup, render aligned wordmark text (font-size 76, centered vertically using dominant-baseline="central")
+    // D. If lockup, render aligned wordmark text (font-size 76, baseline adjusted to y=154 to center all-caps Bebas Neue perfectly)
     if (isLockup) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
-      text.setAttribute('y', '128'); // Center line of the 256px logo
+      text.setAttribute('y', '154'); // Adjusted baseline to account for Bebas Neue cap-height centering
       text.setAttribute('font-family', "'Bebas Neue', -apple-system, sans-serif");
       text.setAttribute('font-weight', '400'); // Bebas Neue is regular weight but bold visually
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
       text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
-      text.setAttribute('dominant-baseline', 'central');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
     }
