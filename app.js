@@ -1,17 +1,31 @@
-// Mondrian Dynamic Identity Generator - Border Joints Update
+// Mondrian Dynamic Identity Generator - Dark Mode Update
 const WIDTH = 256;
 const HEIGHT = 256;
 const STROKE_WIDTH = 8;
 const MIN_BLOCK_SIZE = 35;
 
-// Mondrian Colors
-const COLORS = {
-  white: '#f5f5f7',
-  red: '#e52521',
-  blue: '#0f52ba',
-  yellow: '#facd05',
-  black: '#111112'
-};
+// Theme State
+let currentTheme = 'light';
+
+function getThemeColors() {
+  if (currentTheme === 'dark') {
+    return {
+      white: '#121318', // deep charcoal background blocks
+      black: '#ffffff', // white grid lines and borders
+      red: '#ff3b30',   // vibrant neon red
+      blue: '#0a84ff',  // vibrant neon blue
+      yellow: '#ffd60a' // vibrant neon yellow
+    };
+  } else {
+    return {
+      white: '#f5f5f7', // classic warm white blocks
+      black: '#111112', // classic black borders/lines
+      red: '#e52521',
+      blue: '#0f52ba',
+      yellow: '#facd05'
+    };
+  }
+}
 
 // Canvas State Configuration
 const canvA = {
@@ -61,7 +75,7 @@ const canvC = {
 
 const ALL_CANVASES = [canvA, canvB, canvC];
 
-// 1. Recursive Subdivision Generator (Only returns internal split lines now)
+// 1. Recursive Subdivision Generator (returns keys instead of absolute hex colors)
 function generateMondrianLayout() {
   const rects = [];
   const lines = []; // No outer boundaries here! Handled by single-path border elements.
@@ -97,31 +111,31 @@ function generateMondrianLayout() {
 
   split(0, 0, WIDTH, HEIGHT, 0);
 
-  // Color assignments
+  // Color assignments (assigning semantic keys: 'white', 'red', 'blue', 'yellow', 'black')
   let hasRed = false, hasBlue = false, hasYellow = false, hasBlack = false;
   const shuffled = [...rects].sort(() => Math.random() - 0.5);
 
   shuffled.forEach((r) => {
-    let color = COLORS.white;
+    let fillKey = 'white';
     const rand = Math.random();
     if (!hasRed && rand < 0.2) {
-      color = COLORS.red;
+      fillKey = 'red';
       hasRed = true;
     } else if (!hasBlue && rand < 0.35) {
-      color = COLORS.blue;
+      fillKey = 'blue';
       hasBlue = true;
     } else if (!hasYellow && rand < 0.55) {
-      color = COLORS.yellow;
+      fillKey = 'yellow';
       hasYellow = true;
     } else if (!hasBlack && rand < 0.65 && r.w * r.h < 5000) {
-      color = COLORS.black;
+      fillKey = 'black';
       hasBlack = true;
     }
-    r.fill = color;
+    r.fillKey = fillKey;
   });
 
   if (!hasRed && !hasBlue && !hasYellow) {
-    shuffled[0].fill = COLORS.red;
+    shuffled[0].fillKey = 'red';
   }
 
   return { rects, lines };
@@ -145,10 +159,12 @@ function playTransition(canvas, targetLayout) {
   function renderFrame(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / TOTAL_DURATION, 1);
+    const themeColors = getThemeColors();
     
     // Clear SVG
     canvas.svg.innerHTML = '';
     canvas.svg.setAttribute('viewBox', '-4 -4 264 264');
+    canvas.svg.style.backgroundColor = themeColors.white;
 
     // Setup Clipping Defs
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -224,7 +240,10 @@ function playTransition(canvas, targetLayout) {
         rect.setAttribute('y', r.y);
         rect.setAttribute('width', r.w);
         rect.setAttribute('height', r.h);
-        rect.setAttribute('fill', r.fill);
+        
+        // Resolve semantic fill color
+        const colorHex = themeColors[r.fillKey || 'white'];
+        rect.setAttribute('fill', colorHex);
         rect.setAttribute('fill-opacity', fillOpacity);
         rect.setAttribute('stroke', 'none');
         g.appendChild(rect);
@@ -248,21 +267,20 @@ function playTransition(canvas, targetLayout) {
           line.setAttribute('x2', l.val);
           line.setAttribute('y2', currentEnd);
         }
-        line.setAttribute('stroke', COLORS.black);
+        line.setAttribute('stroke', themeColors.black);
         line.setAttribute('stroke-width', STROKE_WIDTH);
         line.setAttribute('stroke-linecap', 'butt');
         g.appendChild(line);
       });
     }
 
-    // C. Draw perimeter borders (now utilizing stroke-linecap="round" and stroke-linejoin="round"
-    // to overlap start/end points cleanly and resolve gaps/glitches at junctions during drawing)
+    // C. Draw perimeter borders
     if (lineProgress > 0) {
       if (canvas.clip === 'rhombus') {
         const border = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         border.setAttribute('points', '128,0 256,128 128,256 0,128');
         border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', COLORS.black);
+        border.setAttribute('stroke', themeColors.black);
         border.setAttribute('stroke-width', STROKE_WIDTH);
         border.setAttribute('stroke-linecap', 'round');
         border.setAttribute('stroke-linejoin', 'round');
@@ -277,7 +295,7 @@ function playTransition(canvas, targetLayout) {
         border.setAttribute('cy', 128);
         border.setAttribute('r', 128);
         border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', COLORS.black);
+        border.setAttribute('stroke', themeColors.black);
         border.setAttribute('stroke-width', STROKE_WIDTH);
         border.setAttribute('stroke-linecap', 'round');
         
@@ -286,14 +304,13 @@ function playTransition(canvas, targetLayout) {
         border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
         canvas.svg.appendChild(border);
       } else {
-        // Option A (Rectangular) now uses a single continuous path border, matching the perimeter draw of B and C
         const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         border.setAttribute('x', 0);
         border.setAttribute('y', 0);
         border.setAttribute('width', 256);
         border.setAttribute('height', 256);
         border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', COLORS.black);
+        border.setAttribute('stroke', themeColors.black);
         border.setAttribute('stroke-width', STROKE_WIDTH);
         border.setAttribute('stroke-linecap', 'round');
         border.setAttribute('stroke-linejoin', 'round');
@@ -330,7 +347,8 @@ function exportPng(canvasObj, filename, size) {
     canvas.height = size;
     const context = canvas.getContext('2d');
     
-    context.fillStyle = '#ffffff';
+    // Fill back plate matching the current logo theme color
+    context.fillStyle = getThemeColors().white;
     context.fillRect(0, 0, size, size);
     context.drawImage(image, 0, 0, size, size);
     
@@ -345,8 +363,47 @@ function exportPng(canvasObj, filename, size) {
   image.src = blobURL;
 }
 
+function exportSvg(canvasObj, filename) {
+  const svgContent = canvasObj.svg.outerHTML;
+  const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// Global Theme Management
+function updateLogoTheme(theme) {
+  if (currentTheme === theme) return;
+  currentTheme = theme;
+
+  // Toggle active theme button UI
+  document.getElementById('btn-theme-light').classList.toggle('active-theme', theme === 'light');
+  document.getElementById('btn-theme-dark').classList.toggle('active-theme', theme === 'dark');
+
+  const colors = getThemeColors();
+
+  // Redraw all canvases and adjust frames backgrounds
+  ALL_CANVASES.forEach(canv => {
+    canv.svg.parentElement.style.backgroundColor = colors.white;
+    canv.svg.style.backgroundColor = colors.white;
+    if (canv.currentLayout) {
+      playTransition(canv, canv.currentLayout);
+    }
+  });
+}
+
 // Initial setup
 function init() {
+  // Theme listeners
+  document.getElementById('btn-theme-light').addEventListener('click', () => updateLogoTheme('light'));
+  document.getElementById('btn-theme-dark').addEventListener('click', () => updateLogoTheme('dark'));
+
+  // Canvas elements setup
   ALL_CANVASES.forEach(canv => {
     const initial = generateMondrianLayout();
     playTransition(canv, initial);
@@ -372,19 +429,6 @@ function init() {
     canv.btnExportPng256.addEventListener('click', () => exportPng(canv, `data_within_reach_logo_${canv.clip || 'rect'}_256x256.png`, 256));
     canv.btnExportPng1024.addEventListener('click', () => exportPng(canv, `data_within_reach_logo_${canv.clip || 'rect'}_1024x1024.png`, 1024));
   });
-}
-
-function exportSvg(canvasObj, filename) {
-  const svgContent = canvasObj.svg.outerHTML;
-  const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
 }
 
 init();
