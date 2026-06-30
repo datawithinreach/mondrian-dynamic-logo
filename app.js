@@ -380,9 +380,14 @@ function exportPng(canvasObj, filename, targetWidth) {
   const w = targetWidth;
   const h = Math.round(targetWidth / aspect);
   
-  // Set explicit dimensions on the SVG element so the browser rasterizes it at full size
-  clone.setAttribute('width', w);
-  clone.setAttribute('height', h);
+  // Super-sampling: Render the vector SVG at 4x target bounds first to capture high-density details
+  const scaleFactor = 4;
+  const wHigh = w * scaleFactor;
+  const hHigh = h * scaleFactor;
+  
+  // Set explicit high-res dimensions on the cloned SVG element
+  clone.setAttribute('width', wHigh);
+  clone.setAttribute('height', hHigh);
   
   const svgString = new XMLSerializer().serializeToString(clone);
   const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
@@ -393,16 +398,25 @@ function exportPng(canvasObj, filename, targetWidth) {
   image.onload = () => {
     // Add a short delay to ensure the inlined base64 web font has finished decoding and layout activation before drawing to canvas
     setTimeout(() => {
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const context = canvas.getContext('2d');
+      // 1. Draw the high-res SVG image onto a high-res canvas context
+      const highResCanvas = document.createElement('canvas');
+      highResCanvas.width = wHigh;
+      highResCanvas.height = hHigh;
+      const highResCtx = highResCanvas.getContext('2d');
+      highResCtx.clearRect(0, 0, wHigh, hHigh);
+      highResCtx.drawImage(image, 0, 0, wHigh, hHigh);
       
-      // Draw directly onto the transparent canvas context
-      context.clearRect(0, 0, w, h);
-      context.drawImage(image, 0, 0, w, h);
+      // 2. Downsample high-res canvas onto the target-size canvas using high-quality bicubic smoothing (super-sampling)
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = w;
+      finalCanvas.height = h;
+      const finalCtx = finalCanvas.getContext('2d');
+      finalCtx.clearRect(0, 0, w, h);
+      finalCtx.imageSmoothingEnabled = true;
+      finalCtx.imageSmoothingQuality = 'high';
+      finalCtx.drawImage(highResCanvas, 0, 0, w, h);
       
-      const pngURL = canvas.toDataURL('image/png');
+      const pngURL = finalCanvas.toDataURL('image/png');
       const downloadLink = document.createElement('a');
       downloadLink.href = pngURL;
       downloadLink.download = filename;
