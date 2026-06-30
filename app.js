@@ -154,6 +154,12 @@ function playTransition(canvas, targetLayout) {
 
     // Setup Clipping Defs
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    
+    // Inject stylesheet inside SVG context to resolve correct font metrics
+    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@300;400&display=swap');`;
+    defs.appendChild(style);
+
     const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
     clipPath.setAttribute('id', `clip-${canvas.id}-${now}`);
 
@@ -184,7 +190,7 @@ function playTransition(canvas, targetLayout) {
     logoG.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
     
     if (isLockup) {
-      logoG.setAttribute('transform', 'translate(40, 90) scale(0.3)');
+      logoG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
     }
     canvas.svg.appendChild(logoG);
 
@@ -293,7 +299,7 @@ function playTransition(canvas, targetLayout) {
       if (isLockup) {
         // Draw the border scaled inside a container group to match fills/lines perfectly
         const borderG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        borderG.setAttribute('transform', 'translate(40, 90) scale(0.3)');
+        borderG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
         borderG.appendChild(border);
         canvas.svg.appendChild(borderG);
       } else {
@@ -301,16 +307,17 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // D. If lockup, render aligned wordmark text (font-size 76, baseline y=155 for perfect visual centering of Antonio Light)
+    // D. If lockup, render aligned wordmark text (font-size 76, centered vertically using dominant-baseline="central")
     if (isLockup) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
-      text.setAttribute('y', '155'); // Balanced baseline y=155 to match the vertical center of the scaled logo
+      text.setAttribute('y', '128'); // Center line of the 256px logo height space
       text.setAttribute('font-family', "'Antonio', -apple-system, sans-serif");
       text.setAttribute('font-weight', '300'); // Antonio Light
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
       text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
+      text.setAttribute('dominant-baseline', 'central');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
     }
@@ -411,18 +418,6 @@ function updateGlobalTheme(theme, clickedBtn) {
   });
 }
 
-// Setup Synchronized Preview Autoplay
-let previewAutoplayInt = null;
-function startPreviewAutoplay() {
-  if (previewAutoplayInt) clearInterval(previewAutoplayInt);
-  
-  previewAutoplayInt = setInterval(() => {
-    const sharedLayout = generateMondrianLayout();
-    playTransition(canvOnly, sharedLayout);
-    playTransition(canvText, sharedLayout);
-  }, 3000);
-}
-
 // Init Function
 function init() {
   document.getElementById('btn-global-rect').addEventListener('click', (e) => updateGlobalShape(null, e.currentTarget));
@@ -435,6 +430,13 @@ function init() {
   ALL_CANVASES.forEach(canv => {
     const initial = generateMondrianLayout();
     playTransition(canv, initial);
+
+    // Initialize Autoplay on page load
+    canv.isAutoplay = true;
+    canv.btnAutoplay.classList.add('active');
+    canv.autoplayInt = setInterval(() => {
+      playTransition(canv, generateMondrianLayout());
+    }, 3000);
 
     canv.btnNext.addEventListener('click', () => {
       playTransition(canv, generateMondrianLayout());
@@ -465,8 +467,6 @@ function init() {
       exportPng(canv, `data_within_reach_${suffix}_1024.png`, 1024);
     });
   });
-
-  startPreviewAutoplay();
 }
 
 init();
