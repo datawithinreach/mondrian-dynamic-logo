@@ -1,10 +1,11 @@
-// Mondrian Dynamic Identity Generator - Restructured Sandbox Preview Update
+// Mondrian Dynamic Identity Generator - Simplified Focused Previews Engine
 const WIDTH = 256;
 const HEIGHT = 256;
 const STROKE_WIDTH = 8;
 const MIN_BLOCK_SIZE = 35;
 
-// Theme State
+// Global Settings State
+let currentShape = null; // null = Rect, 'rhombus', 'circle'
 let currentTheme = 'light';
 
 function getThemeColors() {
@@ -27,71 +28,36 @@ function getThemeColors() {
   }
 }
 
-// Canvas State Configuration
-const canvA = {
-  id: 'a',
-  svg: document.getElementById('logo-svg'),
-  btnNext: document.getElementById('btn-next'),
-  btnAutoplay: document.getElementById('btn-autoplay'),
-  btnExportSvg: document.getElementById('btn-export-svg-a'),
-  btnExportPng256: document.getElementById('btn-export-png-a-256'),
-  btnExportPng1024: document.getElementById('btn-export-png-a-1024'),
-  currentLayout: null,
-  animId: null,
-  autoplayInt: null,
-  isAutoplay: false,
-  clip: null
-};
-
-const canvB = {
-  id: 'b',
-  svg: document.getElementById('logo-svg-b'),
-  btnNext: document.getElementById('btn-next-b'),
-  btnAutoplay: document.getElementById('btn-autoplay-b'),
-  btnExportSvg: document.getElementById('btn-export-svg-b'),
-  btnExportPng256: document.getElementById('btn-export-png-b-256'),
-  btnExportPng1024: document.getElementById('btn-export-png-b-1024'),
-  currentLayout: null,
-  animId: null,
-  autoplayInt: null,
-  isAutoplay: false,
-  clip: 'rhombus'
-};
-
-const canvC = {
-  id: 'c',
-  svg: document.getElementById('logo-svg-c'),
-  btnNext: document.getElementById('btn-next-c'),
-  btnAutoplay: document.getElementById('btn-autoplay-c'),
-  btnExportSvg: document.getElementById('btn-export-svg-c'),
-  btnExportPng256: document.getElementById('btn-export-png-c-256'),
-  btnExportPng1024: document.getElementById('btn-export-png-c-1024'),
-  currentLayout: null,
-  animId: null,
-  autoplayInt: null,
-  isAutoplay: false,
-  clip: 'circle'
-};
-
-const canvPreviewOnly = {
-  id: 'preview-only',
+// Canvas Configuration
+const canvOnly = {
+  id: 'only',
   svg: document.getElementById('preview-logo-only'),
+  btnNext: document.getElementById('btn-next-only'),
+  btnAutoplay: document.getElementById('btn-autoplay-only'),
+  btnExportSvg: document.getElementById('btn-export-svg-only'),
+  btnExportPng256: document.getElementById('btn-export-png-only-256'),
+  btnExportPng1024: document.getElementById('btn-export-png-only-1024'),
   currentLayout: null,
   animId: null,
-  clip: null // Updated dynamically
+  autoplayInt: null,
+  isAutoplay: false
 };
 
-const canvPreviewText = {
-  id: 'preview-text',
+const canvText = {
+  id: 'text',
   svg: document.getElementById('preview-logo-text'),
+  btnNext: document.getElementById('btn-next-text'),
+  btnAutoplay: document.getElementById('btn-autoplay-text'),
+  btnExportSvg: document.getElementById('btn-export-svg-text'),
+  btnExportPng256: document.getElementById('btn-export-png-text-256'),
+  btnExportPng1024: document.getElementById('btn-export-png-text-1024'),
   currentLayout: null,
   animId: null,
-  clip: null // Updated dynamically
+  autoplayInt: null,
+  isAutoplay: false
 };
 
-const ALL_CANVASES = [canvA, canvB, canvC, canvPreviewOnly, canvPreviewText];
-const PREVIEW_CANVASES = [canvPreviewOnly, canvPreviewText];
-const INTERACTIVE_CANVASES = [canvA, canvB, canvC];
+const ALL_CANVASES = [canvOnly, canvText];
 
 // 1. Recursive Subdivision Generator
 function generateMondrianLayout() {
@@ -180,53 +146,49 @@ function playTransition(canvas, targetLayout) {
     
     // Clear SVG
     canvas.svg.innerHTML = '';
-    canvas.svg.setAttribute('viewBox', '-4 -4 264 264');
     canvas.svg.style.backgroundColor = themeColors.white;
+
+    // Determine viewBox & root elements
+    const isLockup = canvas.id === 'text';
+    canvas.svg.setAttribute('viewBox', isLockup ? '-4 -4 800 264' : '-4 -4 264 264');
 
     // Setup Clipping Defs
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    if (canvas.clip === 'rhombus') {
-      const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-      clipPath.setAttribute('id', `clip-${canvas.id}-${now}`);
+    const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+    clipPath.setAttribute('id', `clip-${canvas.id}-${now}`);
+
+    if (currentShape === 'rhombus') {
       const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
       poly.setAttribute('points', '128,0 256,128 128,256 0,128');
       clipPath.appendChild(poly);
-      defs.appendChild(clipPath);
-    } else if (canvas.clip === 'circle') {
-      const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-      clipPath.setAttribute('id', `clip-${canvas.id}-${now}`);
+    } else if (currentShape === 'circle') {
       const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       circ.setAttribute('cx', 128);
       circ.setAttribute('cy', 128);
       circ.setAttribute('r', 128);
       clipPath.appendChild(circ);
-      defs.appendChild(clipPath);
     } else {
-      const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-      clipPath.setAttribute('id', `clip-${canvas.id}-${now}`);
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       rect.setAttribute('x', 0);
       rect.setAttribute('y', 0);
       rect.setAttribute('width', 256);
       rect.setAttribute('height', 256);
       clipPath.appendChild(rect);
-      defs.appendChild(clipPath);
     }
+    defs.appendChild(clipPath);
     canvas.svg.appendChild(defs);
 
-    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
-    canvas.svg.appendChild(g);
+    // Group for logo drawing (with translation if inside a lockup)
+    const logoG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    logoG.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
+    canvas.svg.appendChild(logoG);
 
     let activeLayout = null;
     let lineProgress = 0;
     let fillOpacity = 0;
-    let isExiting = false;
 
     if (sourceLayout && elapsed <= EXIT_TOTAL_DUR) {
-      isExiting = true;
       activeLayout = sourceLayout;
-
       if (elapsed <= EXIT_FADE_DUR) {
         fillOpacity = 1 - (elapsed / EXIT_FADE_DUR);
         lineProgress = 1.0;
@@ -235,10 +197,8 @@ function playTransition(canvas, targetLayout) {
         lineProgress = 1 - (elapsed - EXIT_FADE_DUR) / EXIT_RETRACT_DUR;
       }
     } else {
-      isExiting = false;
       activeLayout = targetLayout;
       const enterElapsed = sourceLayout ? (elapsed - EXIT_TOTAL_DUR) : elapsed;
-
       if (enterElapsed <= ENTER_DRAW_DUR) {
         lineProgress = enterElapsed / ENTER_DRAW_DUR;
         fillOpacity = 0;
@@ -256,16 +216,14 @@ function playTransition(canvas, targetLayout) {
         rect.setAttribute('y', r.y);
         rect.setAttribute('width', r.w);
         rect.setAttribute('height', r.h);
-        
-        const colorHex = themeColors[r.fillKey || 'white'];
-        rect.setAttribute('fill', colorHex);
+        rect.setAttribute('fill', themeColors[r.fillKey || 'white']);
         rect.setAttribute('fill-opacity', fillOpacity);
         rect.setAttribute('stroke', 'none');
-        g.appendChild(rect);
+        logoG.appendChild(rect);
       });
     }
 
-    // B. Render internal grid lines
+    // B. Render internal lines
     if (lineProgress > 0 && activeLayout.lines) {
       activeLayout.lines.forEach(l => {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -285,56 +243,60 @@ function playTransition(canvas, targetLayout) {
         line.setAttribute('stroke', themeColors.black);
         line.setAttribute('stroke-width', STROKE_WIDTH);
         line.setAttribute('stroke-linecap', 'butt');
-        g.appendChild(line);
+        logoG.appendChild(line);
       });
     }
 
-    // C. Draw perimeter borders
+    // C. Draw perimeter border
     if (lineProgress > 0) {
-      if (canvas.clip === 'rhombus') {
-        const border = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      let border = null;
+      if (currentShape === 'rhombus') {
+        border = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         border.setAttribute('points', '128,0 256,128 128,256 0,128');
-        border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', themeColors.black);
-        border.setAttribute('stroke-width', STROKE_WIDTH);
-        border.setAttribute('stroke-linecap', 'round');
         border.setAttribute('stroke-linejoin', 'round');
-        
+        border.setAttribute('stroke-linecap', 'round');
         const perimeter = 724.0;
         border.setAttribute('stroke-dasharray', perimeter);
         border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
-        canvas.svg.appendChild(border);
-      } else if (canvas.clip === 'circle') {
-        const border = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      } else if (currentShape === 'circle') {
+        border = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         border.setAttribute('cx', 128);
         border.setAttribute('cy', 128);
         border.setAttribute('r', 128);
-        border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', themeColors.black);
-        border.setAttribute('stroke-width', STROKE_WIDTH);
         border.setAttribute('stroke-linecap', 'round');
-        
         const perimeter = 804.2;
         border.setAttribute('stroke-dasharray', perimeter);
         border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
-        canvas.svg.appendChild(border);
       } else {
-        const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         border.setAttribute('x', 0);
         border.setAttribute('y', 0);
         border.setAttribute('width', 256);
         border.setAttribute('height', 256);
-        border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', themeColors.black);
-        border.setAttribute('stroke-width', STROKE_WIDTH);
-        border.setAttribute('stroke-linecap', 'round');
         border.setAttribute('stroke-linejoin', 'round');
-        
+        border.setAttribute('stroke-linecap', 'round');
         const perimeter = 1024.0;
         border.setAttribute('stroke-dasharray', perimeter);
         border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
-        canvas.svg.appendChild(border);
       }
+      border.setAttribute('fill', 'none');
+      border.setAttribute('stroke', themeColors.black);
+      border.setAttribute('stroke-width', STROKE_WIDTH);
+      canvas.svg.appendChild(border);
+    }
+
+    // D. If lockup, render full wordmark text
+    if (isLockup) {
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', '290');
+      text.setAttribute('y', '152');
+      text.setAttribute('font-family', "'Inter', -apple-system, sans-serif");
+      text.setAttribute('font-weight', '900');
+      text.setAttribute('font-size', '44');
+      text.setAttribute('fill', themeColors.black);
+      text.setAttribute('letter-spacing', '-0.02em');
+      text.textContent = 'DATA WITHIN REACH';
+      canvas.svg.appendChild(text);
     }
 
     if (progress < 1) {
@@ -349,7 +311,7 @@ function playTransition(canvas, targetLayout) {
 }
 
 // 3. Exporters
-function exportPng(canvasObj, filename, size) {
+function exportPng(canvasObj, filename, targetWidth) {
   const svgString = new XMLSerializer().serializeToString(canvasObj.svg);
   const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
   const URL = window.URL || window.webkitURL || window;
@@ -358,13 +320,19 @@ function exportPng(canvasObj, filename, size) {
   const image = new Image();
   image.onload = () => {
     const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
+    const isLockup = canvasObj.id === 'text';
+    const aspect = isLockup ? (800 / 264) : 1;
+    
+    const w = targetWidth;
+    const h = Math.round(targetWidth / aspect);
+    
+    canvas.width = w;
+    canvas.height = h;
     const context = canvas.getContext('2d');
     
     context.fillStyle = getThemeColors().white;
-    context.fillRect(0, 0, size, size);
-    context.drawImage(image, 0, 0, size, size);
+    context.fillRect(0, 0, w, h);
+    context.drawImage(image, 0, 0, w, h);
     
     const pngURL = canvas.toDataURL('image/png');
     const downloadLink = document.createElement('a');
@@ -390,16 +358,34 @@ function exportSvg(canvasObj, filename) {
   URL.revokeObjectURL(url);
 }
 
-// Global Theme Management
-function updateLogoTheme(theme) {
+// Global Options Switchers
+function updateGlobalShape(shape, clickedBtn) {
+  if (currentShape === shape) return;
+  currentShape = shape;
+
+  document.querySelectorAll('.global-controls-section #btn-global-rect, #btn-global-rhombus, #btn-global-circle').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  clickedBtn.classList.add('active');
+
+  // Redraw both previews instantly with new subdivisions
+  ALL_CANVASES.forEach(canv => {
+    playTransition(canv, generateMondrianLayout());
+  });
+}
+
+function updateGlobalTheme(theme, clickedBtn) {
   if (currentTheme === theme) return;
   currentTheme = theme;
 
-  document.getElementById('btn-sb-light').classList.toggle('active', theme === 'light');
-  document.getElementById('btn-sb-dark').classList.toggle('active', theme === 'dark');
+  document.querySelectorAll('.global-controls-section #btn-global-light, #btn-global-dark').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  clickedBtn.classList.add('active');
 
   const colors = getThemeColors();
 
+  // Adjust preview frame containers backgrounds and trigger redraw
   ALL_CANVASES.forEach(canv => {
     canv.svg.parentElement.style.backgroundColor = colors.white;
     canv.svg.style.backgroundColor = colors.white;
@@ -409,78 +395,53 @@ function updateLogoTheme(theme) {
   });
 }
 
-// Setup Synchronized Preview Autoplay
-let previewAutoplayInt = null;
-function startPreviewAutoplay() {
-  if (previewAutoplayInt) clearInterval(previewAutoplayInt);
-  
-  previewAutoplayInt = setInterval(() => {
-    // Generate a single synchronized layout for both preview states
-    const sharedLayout = generateMondrianLayout();
-    playTransition(canvPreviewOnly, sharedLayout);
-    playTransition(canvPreviewText, sharedLayout);
-  }, 3000);
-}
-
-// Initial setup
+// Init Function
 function init() {
-  // Theme listeners
-  document.getElementById('btn-sb-light').addEventListener('click', () => updateLogoTheme('light'));
-  document.getElementById('btn-sb-dark').addEventListener('click', () => updateLogoTheme('dark'));
+  // Shape Event Attachments
+  document.getElementById('btn-global-rect').addEventListener('click', (e) => updateGlobalShape(null, e.currentTarget));
+  document.getElementById('btn-global-rhombus').addEventListener('click', (e) => updateGlobalShape('rhombus', e.currentTarget));
+  document.getElementById('btn-global-circle').addEventListener('click', (e) => updateGlobalShape('circle', e.currentTarget));
 
-  // Preview shape selectors
-  const btnPrevRect = document.getElementById('btn-sb-rect');
-  const btnPrevRhombus = document.getElementById('btn-sb-rhombus');
-  const btnPrevCircle = document.getElementById('btn-sb-circle');
+  // Theme Event Attachments
+  document.getElementById('btn-global-light').addEventListener('click', (e) => updateGlobalTheme('light', e.currentTarget));
+  document.getElementById('btn-global-dark').addEventListener('click', (e) => updateGlobalTheme('dark', e.currentTarget));
 
-  function updatePreviewClip(clipType, clickedBtn) {
-    [canvPreviewOnly, canvPreviewText].forEach(canv => canv.clip = clipType);
-    [btnPrevRect, btnPrevRhombus, btnPrevCircle].forEach(btn => btn.classList.remove('active'));
-    clickedBtn.classList.add('active');
-    
-    // Play transition instantly with a new layout
-    const newLayout = generateMondrianLayout();
-    playTransition(canvPreviewOnly, newLayout);
-    playTransition(canvPreviewText, newLayout);
-    
-    // Reset autoplay timer
-    startPreviewAutoplay();
-  }
-
-  btnPrevRect.addEventListener('click', () => updatePreviewClip(null, btnPrevRect));
-  btnPrevRhombus.addEventListener('click', () => updatePreviewClip('rhombus', btnPrevRhombus));
-  btnPrevCircle.addEventListener('click', () => updatePreviewClip('circle', btnPrevCircle));
-
-  // Initialize all canvases
+  // Canvas-Specific Loops & Control Bindings
   ALL_CANVASES.forEach(canv => {
     const initial = generateMondrianLayout();
     playTransition(canv, initial);
-  });
 
-  // Start the 3-second live preview loop
-  startPreviewAutoplay();
-
-  // Setup interactive canvases controls (A, B, C)
-  INTERACTIVE_CANVASES.forEach(canv => {
+    // Manual next layout trigger
     canv.btnNext.addEventListener('click', () => {
       playTransition(canv, generateMondrianLayout());
     });
 
+    // Autoplay trigger
     canv.btnAutoplay.addEventListener('click', () => {
       canv.isAutoplay = !canv.isAutoplay;
       canv.btnAutoplay.classList.toggle('active', canv.isAutoplay);
       if (canv.isAutoplay) {
         canv.autoplayInt = setInterval(() => {
           playTransition(canv, generateMondrianLayout());
-        }, 4000);
+        }, 3000);
       } else {
         clearInterval(canv.autoplayInt);
       }
     });
 
-    canv.btnExportSvg.addEventListener('click', () => exportSvg(canv, `data_within_reach_logo_${canv.clip || 'rect'}.svg`));
-    canv.btnExportPng256.addEventListener('click', () => exportPng(canv, `data_within_reach_logo_${canv.clip || 'rect'}_256x256.png`, 256));
-    canv.btnExportPng1024.addEventListener('click', () => exportPng(canv, `data_within_reach_logo_${canv.clip || 'rect'}_1024x1024.png`, 1024));
+    // Exports attachments
+    canv.btnExportSvg.addEventListener('click', () => {
+      const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
+      exportSvg(canv, `data_within_reach_${suffix}.svg`);
+    });
+    canv.btnExportPng256.addEventListener('click', () => {
+      const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
+      exportPng(canv, `data_within_reach_${suffix}_256.png`, 256);
+    });
+    canv.btnExportPng1024.addEventListener('click', () => {
+      const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
+      exportPng(canv, `data_within_reach_${suffix}_1024.png`, 1024);
+    });
   });
 }
 

@@ -51,7 +51,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
   <link rel="manifest" href="favicon_io/site.webmanifest">
 
-  <!-- Modern Inter Font (Importing 800 & 900 for bold Mondrian style pairing) -->
+  <!-- Modern Inter Font (Importing ultra-bold 800 & 900 weights) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -59,210 +59,120 @@
 </head>
 <body>
   <div class="app-container">
+    <!-- Top Section: Title & Description -->
     <header class="app-header">
-      <div class="logo-text">Data Within Reach</div>
-      <div class="badge">Research Group</div>
+      <div class="header-logo-text">DATA WITHIN REACH</div>
+      <div class="badge">Generative Identity System</div>
     </header>
+    
+    <section class="intro-section">
+      <p class="description">
+        An interactive visual identity system inspired by Piet Mondrian's neoplasticism. Configure global options to set the active shape and color theme, and use independent controls below to customize and export brand assets.
+      </p>
+    </section>
 
-    <main class="main-content">
-      <!-- Left Column: Both Options Stacked -->
-      <div class="canvas-stack">
-        <!-- Option A Card -->
-        <div class="canvas-card">
-          <div class="card-header">
-            <h3>Option A: The Shifting Grid (Rectangular)</h3>
-            <span class="card-desc">Standard neoplastic block composition</span>
-          </div>
-          
-          <div class="canvas-frame">
-            <svg id="logo-svg" viewBox="0 0 256 256" width="256" height="256" xmlns="http://www.w3.org/2000/svg">
-              <!-- Dynamic elements for Option A -->
-            </svg>
-          </div>
-          <div class="dimensions-label">256 × 256 px</div>
-          
-          <!-- Option A Specific Controls -->
-          <div class="card-actions">
-            <button id="btn-next" class="btn primary-btn btn-sm">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
-              </svg>
-              Next Layout
-            </button>
-            <button id="btn-autoplay" class="btn secondary-btn btn-sm">
-              <span class="pulse-indicator"></span>
-              Auto Play
-            </button>
-            <button id="btn-export-svg-a" class="btn outline-btn btn-sm" title="Download Vector SVG">
-              SVG
-            </button>
-            <button id="btn-export-png-a-256" class="btn outline-btn btn-sm">
-              PNG (256)
-            </button>
-            <button id="btn-export-png-a-1024" class="btn outline-btn btn-sm">
-              PNG (1024)
-            </button>
-          </div>
-        </div>
-
-        <!-- Option B Card -->
-        <div class="canvas-card">
-          <div class="card-header">
-            <h3>Option B: Rhombus Logo</h3>
-            <span class="card-desc">Neoplastic composition clipped to a diamond outline</span>
-          </div>
-
-          <div class="canvas-frame">
-            <svg id="logo-svg-b" viewBox="0 0 256 256" width="256" height="256" xmlns="http://www.w3.org/2000/svg">
-              <!-- Dynamic elements for Option B -->
-            </svg>
-          </div>
-          <div class="dimensions-label">256 × 256 px</div>
-
-          <!-- Option B Specific Controls -->
-          <div class="card-actions">
-            <button id="btn-next-b" class="btn primary-btn btn-sm">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
-              </svg>
-              Next Layout
-            </button>
-            <button id="btn-autoplay-b" class="btn secondary-btn btn-sm">
-              <span class="pulse-indicator"></span>
-              Auto Play
-            </button>
-            <button id="btn-export-svg-b" class="btn outline-btn btn-sm" title="Download Vector SVG">
-              SVG
-            </button>
-            <button id="btn-export-png-b-256" class="btn outline-btn btn-sm">
-              PNG (256)
-            </button>
-            <button id="btn-export-png-b-1024" class="btn outline-btn btn-sm">
-              PNG (1024)
-            </button>
-          </div>
-        </div>
-
-        <!-- Option C Card -->
-        <div class="canvas-card">
-          <div class="card-header">
-            <h3>Option C: Circular Logo</h3>
-            <span class="card-desc">Neoplastic composition clipped to a circular boundary</span>
-          </div>
-
-          <div class="canvas-frame">
-            <svg id="logo-svg-c" viewBox="0 0 256 256" width="256" height="256" xmlns="http://www.w3.org/2000/svg">
-              <!-- Dynamic elements for Option C -->
-            </svg>
-          </div>
-          <div class="dimensions-label">256 × 256 px</div>
-
-          <!-- Option C Specific Controls -->
-          <div class="card-actions">
-            <button id="btn-next-c" class="btn primary-btn btn-sm">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
-              </svg>
-              Next Layout
-            </button>
-            <button id="btn-autoplay-c" class="btn secondary-btn btn-sm">
-              <span class="pulse-indicator"></span>
-              Auto Play
-            </button>
-            <button id="btn-export-svg-c" class="btn outline-btn btn-sm" title="Download Vector SVG">
-              SVG
-            </button>
-            <button id="btn-export-png-c-256" class="btn outline-btn btn-sm">
-              PNG (256)
-            </button>
-            <button id="btn-export-png-c-1024" class="btn outline-btn btn-sm">
-              PNG (1024)
-            </button>
-          </div>
+    <!-- Global Controls: Shape & Theme -->
+    <section class="global-controls-section">
+      <div class="global-control-group">
+        <span class="global-control-label">Shape</span>
+        <div class="btn-group">
+          <button id="btn-global-rect" class="btn-sb active">Rectangular</button>
+          <button id="btn-global-rhombus" class="btn-sb">Rhombus</button>
+          <button id="btn-global-circle" class="btn-sb">Circle</button>
         </div>
       </div>
+      <div class="global-control-group">
+        <span class="global-control-label">Theme</span>
+        <div class="btn-group">
+          <button id="btn-global-light" class="btn-sb active">Classic Light</button>
+          <button id="btn-global-dark" class="btn-sb">Midnight Dark</button>
+        </div>
+      </div>
+    </section>
 
-      <!-- Right Column: Info & Project description -->
-      <section class="control-panel">
-        <!-- Brand Identity Preview Sandbox -->
-        <div class="live-identity-card">
-          <div class="sandbox-controls">
-            <!-- Shape Controls -->
-            <div class="control-group">
-              <span class="control-label">Shape</span>
-              <div class="btn-group">
-                <button id="btn-sb-rect" class="btn-sb active">Rect</button>
-                <button id="btn-sb-rhombus" class="btn-sb">Rhombus</button>
-                <button id="btn-sb-circle" class="btn-sb">Circle</button>
-              </div>
-            </div>
-            <!-- Theme Controls -->
-            <div class="control-group">
-              <span class="control-label">Theme</span>
-              <div class="btn-group">
-                <button id="btn-sb-light" class="btn-sb active">Light</button>
-                <button id="btn-sb-dark" class="btn-sb">Dark</button>
-              </div>
-            </div>
+    <!-- Main Previews Sandbox -->
+    <main class="previews-main">
+      <!-- Preview Card 1: Just Logo -->
+      <section class="preview-card">
+        <div class="card-header-simple">
+          <h2>Configuration 1: Standalone Logo</h2>
+          <span class="card-desc">Ideal for avatars, icons, and page margins</span>
+        </div>
+        
+        <div class="card-body-row">
+          <!-- Logo Display -->
+          <div class="preview-logo-frame only">
+            <svg id="preview-logo-only" viewBox="-4 -4 264 264" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <!-- Dynamic logo here -->
+            </svg>
           </div>
           
-          <div class="sandbox-previews">
-            <!-- Configuration 1: Just Logo -->
-            <div class="preview-item">
-              <span class="preview-label">Just Logo</span>
-              <div class="preview-logo-frame">
-                <svg id="preview-logo-only" viewBox="-4 -4 264 264" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Standalone dynamic logo -->
+          <!-- Actions & Info -->
+          <div class="preview-actions-panel">
+            <div class="action-buttons-group">
+              <button id="btn-next-only" class="btn primary-btn btn-sm">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
                 </svg>
-              </div>
+                Next Layout
+              </button>
+              <button id="btn-autoplay-only" class="btn secondary-btn btn-sm">
+                <span class="pulse-indicator"></span>
+                Auto Play
+              </button>
             </div>
             
-            <!-- Configuration 2: Logo + Full Group Name -->
-            <div class="preview-item">
-              <span class="preview-label">Logo + Full Group Name</span>
-              <div class="lockup-box">
-                <div class="preview-logo-frame">
-                  <svg id="preview-logo-text" viewBox="-4 -4 264 264" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Lockup dynamic logo -->
-                  </svg>
-                </div>
-                <div class="identity-name">DATA WITHIN REACH</div>
-              </div>
+            <div class="divider-thin"></div>
+            
+            <div class="export-buttons-group">
+              <span class="export-label">Export:</span>
+              <button id="btn-export-svg-only" class="btn outline-btn btn-sm">SVG</button>
+              <button id="btn-export-png-only-256" class="btn outline-btn btn-sm">PNG (256)</button>
+              <button id="btn-export-png-only-1024" class="btn outline-btn btn-sm">PNG (1024)</button>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="divider"></div>
-
-        <h1>Generative Identity</h1>
-        <p class="description">
-          A dynamic logo design project inspired by Piet Mondrian's neoplasticism. Consisting of shifting structures representing fluid data patterns and connections brought within reach.
-        </p>
-
-        <div class="concept-details">
-          <div class="concept-point">
-            <strong>Option A (Rectangular)</strong>
-            <p>Standard rectangular grid structure containing dynamic color-block shifts.</p>
-          </div>
-          <div class="concept-point" style="margin-top: 1rem;">
-            <strong>Option B (Rhombus Logo)</strong>
-            <p>A diamond geometric composition containing horizontal and vertical grids. Clean, modern geometric badge style.</p>
-          </div>
-          <div class="concept-point" style="margin-top: 1rem;">
-            <strong>Option C (Circular Logo)</strong>
-            <p>A circular badge style where neoplastic cells are constrained inside a perfect loop. Extremely premium visual identity.</p>
-          </div>
+      <!-- Preview Card 2: Logo + Group Name Text -->
+      <section class="preview-card">
+        <div class="card-header-simple">
+          <h2>Configuration 2: Logo + Group Name Text</h2>
+          <span class="card-desc">Full brand lockup for presentations, documents, and banners</span>
         </div>
-
-        <div class="divider"></div>
         
-        <div class="usage-instructions">
-          <h2>Usage Guide</h2>
-          <ul>
-            <li>Click <strong>Next Layout</strong> on any version to trigger animated grid shifts.</li>
-            <li>Enable <strong>Auto Play</strong> to run them as ambient screen savers.</li>
-            <li>Export as <strong>SVG</strong> for papers (vector format) or high-res **PNG** for slides.</li>
-          </ul>
+        <div class="card-body-row">
+          <!-- Logo + Text SVG Display -->
+          <div class="preview-logo-frame lockup">
+            <svg id="preview-logo-text" viewBox="-4 -4 800 264" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <!-- Lockup dynamic logo & text here -->
+            </svg>
+          </div>
+          
+          <!-- Actions & Info -->
+          <div class="preview-actions-panel">
+            <div class="action-buttons-group">
+              <button id="btn-next-text" class="btn primary-btn btn-sm">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.73" />
+                </svg>
+                Next Layout
+              </button>
+              <button id="btn-autoplay-text" class="btn secondary-btn btn-sm">
+                <span class="pulse-indicator"></span>
+                Auto Play
+              </button>
+            </div>
+            
+            <div class="divider-thin"></div>
+            
+            <div class="export-buttons-group">
+              <span class="export-label">Export:</span>
+              <button id="btn-export-svg-text" class="btn outline-btn btn-sm">SVG</button>
+              <button id="btn-export-png-text-256" class="btn outline-btn btn-sm">PNG (256)</button>
+              <button id="btn-export-png-text-1024" class="btn outline-btn btn-sm">PNG (1024)</button>
+            </div>
+          </div>
         </div>
       </section>
     </main>
