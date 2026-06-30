@@ -76,7 +76,22 @@ const canvMonogram = {
   isAutoplay: false
 };
 
-const ALL_CANVASES = [canvOnly, canvText, canvMonogram];
+const canvGeom = {
+  id: 'geom',
+  svg: document.getElementById('preview-logo-geom'),
+  btnNext: document.getElementById('btn-next-geom'),
+  btnAutoplay: document.getElementById('btn-autoplay-geom'),
+  btnExportSvg: document.getElementById('btn-export-svg-geom'),
+  btnExportPng512: document.getElementById('btn-export-png-geom-512'),
+  btnExportPng1024: document.getElementById('btn-export-png-geom-1024'),
+  btnExportPng2048: document.getElementById('btn-export-png-geom-2048'),
+  currentLayout: null,
+  animId: null,
+  autoplayInt: null,
+  isAutoplay: false
+};
+
+const ALL_CANVASES = [canvOnly, canvText, canvMonogram, canvGeom];
 
 // 1. Recursive Subdivision Generator
 function generateMondrianLayout() {
@@ -168,7 +183,7 @@ function playTransition(canvas, targetLayout) {
     canvas.svg.style.backgroundColor = themeColors.white;
 
     // Determine viewBox & root elements
-    const isLockup = canvas.id === 'text';
+    const isLockup = canvas.id === 'text' || canvas.id === 'geom';
     canvas.svg.setAttribute('viewBox', isLockup ? '-4 -4 1056 264' : '-4 -4 264 264');
 
     // Setup Clipping Defs
@@ -345,20 +360,56 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // D. If lockup, render aligned wordmark text (font-size 76, centered vertically using alignment-baseline="middle")
+    // D. If lockup, render wordmark (Standard Oswald typography for 'text' or custom geometric for 'geom')
     if (isLockup) {
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', '140');
-      text.setAttribute('y', '128'); // Center line of the 256px logo height space
-      text.setAttribute('dy', '8'); // Finely nudge vertical alignment down for perfect visual center alignment
-      text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '300'); // Oswald Light
-      text.setAttribute('font-size', '76');
-      text.setAttribute('fill', themeColors.black);
-      text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
-      text.setAttribute('alignment-baseline', 'middle');
-      text.textContent = 'DATA WITHIN REACH';
-      containerG.appendChild(text);
+      if (canvas.id === 'text') {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', '140');
+        text.setAttribute('y', '128'); // Center line of the 256px logo height space
+        text.setAttribute('dy', '8'); // Finely nudge vertical alignment down for perfect visual center alignment
+        text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+        text.setAttribute('font-weight', '300'); // Oswald Light
+        text.setAttribute('font-size', '76');
+        text.setAttribute('fill', themeColors.black);
+        text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
+        text.setAttribute('alignment-baseline', 'middle');
+        text.textContent = 'DATA WITHIN REACH';
+        containerG.appendChild(text);
+      } else if (canvas.id === 'geom') {
+        const geomG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        geomG.setAttribute('transform', 'translate(360, 89.6) scale(0.3)');
+        
+        const pathD = [
+          // DATA
+          "M 0,32 L 0,224 L 48,224 L 64,208 L 64,48 L 48,32 Z", // D
+          "M 80,224 L 80,80 L 112,32 L 144,80 L 144,224 M 80,128 L 144,128", // A
+          "M 160,32 L 256,32 M 192,32 L 192,224", // T
+          "M 224,224 L 224,80 L 248,56 L 272,80 L 272,224 M 224,144 L 272,144", // A
+
+          // WITHIN
+          "M 320,32 L 320,224 L 344,128 L 368,224 L 368,32", // W + I
+          "M 368,32 L 424,32 M 396,32 L 396,224", // T
+          "M 424,32 L 424,224 M 424,128 L 472,128 M 472,32 L 472,224", // H
+          "M 496,224 L 496,32 L 544,224 L 544,32", // I + N
+
+          // REACH
+          "M 592,224 L 592,32 L 632,32 L 640,48 L 640,112 L 632,128 L 592,128 M 616,128 L 640,224", // R
+          "M 704,32 L 664,32 L 664,224 L 704,224 M 664,128 L 696,128", // E
+          "M 696,200 L 696,80 L 712,48 L 728,80 L 728,200 M 696,128 L 728,128", // A (tucked)
+          "M 792,32 L 752,32 L 752,224 L 792,224", // C
+          "M 816,32 L 816,224 M 816,128 L 856,128 M 856,32 L 856,224" // H
+        ].join(' ');
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathD);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', themeColors.black);
+        path.setAttribute('stroke-width', '15'); // Matches visual weight of logo grid lines
+        path.setAttribute('stroke-linecap', 'square');
+        path.setAttribute('stroke-linejoin', 'miter');
+        geomG.appendChild(path);
+        containerG.appendChild(geomG);
+      }
 
       // Auto-crop viewBox to wrap the bounding box tightly with a 16px safety padding (eliminates wasted canvas space)
       const bbox = containerG.getBBox();
@@ -615,19 +666,31 @@ function init() {
     });
 
     canv.btnExportSvg.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
+      let suffix = 'standalone';
+      if (canv.id === 'text') suffix = 'brand_lockup';
+      else if (canv.id === 'monogram') suffix = 'monogram';
+      else if (canv.id === 'geom') suffix = 'geometric';
       exportSvg(canv, `data_within_reach_${suffix}.svg`);
     });
     canv.btnExportPng512.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
+      let suffix = 'standalone';
+      if (canv.id === 'text') suffix = 'brand_lockup';
+      else if (canv.id === 'monogram') suffix = 'monogram';
+      else if (canv.id === 'geom') suffix = 'geometric';
       exportPng(canv, `data_within_reach_${suffix}_512.png`, 512);
     });
     canv.btnExportPng1024.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
+      let suffix = 'standalone';
+      if (canv.id === 'text') suffix = 'brand_lockup';
+      else if (canv.id === 'monogram') suffix = 'monogram';
+      else if (canv.id === 'geom') suffix = 'geometric';
       exportPng(canv, `data_within_reach_${suffix}_1024.png`, 1024);
     });
     canv.btnExportPng2048.addEventListener('click', () => {
-      const suffix = canv.id === 'text' ? 'brand_lockup' : (canv.id === 'monogram' ? 'monogram' : 'standalone');
+      let suffix = 'standalone';
+      if (canv.id === 'text') suffix = 'brand_lockup';
+      else if (canv.id === 'monogram') suffix = 'monogram';
+      else if (canv.id === 'geom') suffix = 'geometric';
       exportPng(canv, `data_within_reach_${suffix}_2048.png`, 2048);
     });
   });
