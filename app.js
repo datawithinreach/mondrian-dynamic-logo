@@ -245,7 +245,7 @@ function playTransition(canvas, targetLayout) {
           line.setAttribute('x2', l.val);
           line.setAttribute('y2', currentEnd);
         }
-        const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+        const currentStrokeWidth = isLockup ? 12 : STROKE_WIDTH;
         line.setAttribute('stroke', themeColors.black);
         line.setAttribute('stroke-width', currentStrokeWidth);
         line.setAttribute('stroke-linecap', 'butt');
@@ -285,7 +285,7 @@ function playTransition(canvas, targetLayout) {
         border.setAttribute('stroke-dasharray', perimeter);
         border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
       }
-      const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+      const currentStrokeWidth = isLockup ? 12 : STROKE_WIDTH;
       border.setAttribute('fill', 'none');
       border.setAttribute('stroke', themeColors.black);
       border.setAttribute('stroke-width', currentStrokeWidth);
@@ -307,7 +307,7 @@ function playTransition(canvas, targetLayout) {
       text.setAttribute('x', '140');
       text.setAttribute('y', '128'); // Center line of the 256px logo
       text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '500'); // Clean medium weight instead of heavy bold
+      text.setAttribute('font-weight', '400'); // Regular weight instead of medium/bold
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
       text.setAttribute('letter-spacing', '0.01em');
