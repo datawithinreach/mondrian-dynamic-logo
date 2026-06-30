@@ -368,3 +368,98 @@ body {
   border-color: var(--text-color);
 }
 
+/* Live Brand Identity Preview Card */
+.live-identity-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.identity-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.selector-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.selector-btns {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-preview {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.btn-preview:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.btn-preview.active {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-color);
+  color: #ffffff;
+}
+
+.identity-preview-box {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.preview-logo-frame {
+  width: 64px;
+  height: 64px;
+  background: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
+
+#preview-logo-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.identity-name {
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: #ffffff;
+  font-family: var(--font-family);
+}
+
+

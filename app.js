@@ -1,4 +1,4 @@
-// Mondrian Dynamic Identity Generator - Dark Mode Update
+// Mondrian Dynamic Identity Generator - Live Identity Preview Update
 const WIDTH = 256;
 const HEIGHT = 256;
 const STROKE_WIDTH = 8;
@@ -73,12 +73,23 @@ const canvC = {
   clip: 'circle'
 };
 
-const ALL_CANVASES = [canvA, canvB, canvC];
+const canvPreview = {
+  id: 'preview',
+  svg: document.getElementById('preview-logo-svg'),
+  currentLayout: null,
+  animId: null,
+  autoplayInt: null,
+  isAutoplay: true,
+  clip: null // null = Rect, 'rhombus', 'circle'
+};
 
-// 1. Recursive Subdivision Generator (returns keys instead of absolute hex colors)
+const ALL_CANVASES = [canvA, canvB, canvC, canvPreview];
+const INTERACTIVE_CANVASES = [canvA, canvB, canvC];
+
+// 1. Recursive Subdivision Generator
 function generateMondrianLayout() {
   const rects = [];
-  const lines = []; // No outer boundaries here! Handled by single-path border elements.
+  const lines = [];
 
   function split(x, y, w, h, depth) {
     const canSplitH = h >= MIN_BLOCK_SIZE * 2;
@@ -111,7 +122,6 @@ function generateMondrianLayout() {
 
   split(0, 0, WIDTH, HEIGHT, 0);
 
-  // Color assignments (assigning semantic keys: 'white', 'red', 'blue', 'yellow', 'black')
   let hasRed = false, hasBlue = false, hasYellow = false, hasBlack = false;
   const shuffled = [...rects].sort(() => Math.random() - 0.5);
 
@@ -185,7 +195,6 @@ function playTransition(canvas, targetLayout) {
       clipPath.appendChild(circ);
       defs.appendChild(clipPath);
     } else {
-      // Option A uses a rectangular clip path to contain outer bounds cleanly
       const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
       clipPath.setAttribute('id', `clip-${canvas.id}-${now}`);
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -241,7 +250,6 @@ function playTransition(canvas, targetLayout) {
         rect.setAttribute('width', r.w);
         rect.setAttribute('height', r.h);
         
-        // Resolve semantic fill color
         const colorHex = themeColors[r.fillKey || 'white'];
         rect.setAttribute('fill', colorHex);
         rect.setAttribute('fill-opacity', fillOpacity);
@@ -250,7 +258,7 @@ function playTransition(canvas, targetLayout) {
       });
     }
 
-    // B. Render internal grid lines (using butt caps to avoid border leakage)
+    // B. Render internal grid lines
     if (lineProgress > 0 && activeLayout.lines) {
       activeLayout.lines.forEach(l => {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -347,7 +355,6 @@ function exportPng(canvasObj, filename, size) {
     canvas.height = size;
     const context = canvas.getContext('2d');
     
-    // Fill back plate matching the current logo theme color
     context.fillStyle = getThemeColors().white;
     context.fillRect(0, 0, size, size);
     context.drawImage(image, 0, 0, size, size);
@@ -381,13 +388,11 @@ function updateLogoTheme(theme) {
   if (currentTheme === theme) return;
   currentTheme = theme;
 
-  // Toggle active theme button UI
   document.getElementById('btn-theme-light').classList.toggle('active-theme', theme === 'light');
   document.getElementById('btn-theme-dark').classList.toggle('active-theme', theme === 'dark');
 
   const colors = getThemeColors();
 
-  // Redraw all canvases and adjust frames backgrounds
   ALL_CANVASES.forEach(canv => {
     canv.svg.parentElement.style.backgroundColor = colors.white;
     canv.svg.style.backgroundColor = colors.white;
@@ -397,18 +402,51 @@ function updateLogoTheme(theme) {
   });
 }
 
+// Setup Preview Autoplay
+function startPreviewAutoplay() {
+  if (canvPreview.autoplayInt) clearInterval(canvPreview.autoplayInt);
+  canvPreview.autoplayInt = setInterval(() => {
+    playTransition(canvPreview, generateMondrianLayout());
+  }, 3000);
+}
+
 // Initial setup
 function init() {
   // Theme listeners
   document.getElementById('btn-theme-light').addEventListener('click', () => updateLogoTheme('light'));
   document.getElementById('btn-theme-dark').addEventListener('click', () => updateLogoTheme('dark'));
 
-  // Canvas elements setup
+  // Preview shape selectors
+  const btnPrevRect = document.getElementById('btn-preview-rect');
+  const btnPrevRhombus = document.getElementById('btn-preview-rhombus');
+  const btnPrevCircle = document.getElementById('btn-preview-circle');
+
+  function updatePreviewClip(clipType, clickedBtn) {
+    canvPreview.clip = clipType;
+    [btnPrevRect, btnPrevRhombus, btnPrevCircle].forEach(btn => btn.classList.remove('active'));
+    clickedBtn.classList.add('active');
+    
+    // Play transition instantly with a new layout
+    playTransition(canvPreview, generateMondrianLayout());
+    // Reset autoplay timer
+    startPreviewAutoplay();
+  }
+
+  btnPrevRect.addEventListener('click', () => updatePreviewClip(null, btnPrevRect));
+  btnPrevRhombus.addEventListener('click', () => updatePreviewClip('rhombus', btnPrevRhombus));
+  btnPrevCircle.addEventListener('click', () => updatePreviewClip('circle', btnPrevCircle));
+
+  // Initialize all canvases
   ALL_CANVASES.forEach(canv => {
     const initial = generateMondrianLayout();
     playTransition(canv, initial);
+  });
 
-    // Event attachments
+  // Start the 3-second live preview loop
+  startPreviewAutoplay();
+
+  // Setup interactive canvases controls (A, B, C)
+  INTERACTIVE_CANVASES.forEach(canv => {
     canv.btnNext.addEventListener('click', () => {
       playTransition(canv, generateMondrianLayout());
     });

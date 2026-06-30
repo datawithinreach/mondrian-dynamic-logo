@@ -51,10 +51,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
   <link rel="manifest" href="favicon_io/site.webmanifest">
 
-  <!-- Modern Inter Font -->
+  <!-- Modern Inter Font (Importing 800 & 900 for bold Mondrian style pairing) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -184,6 +184,28 @@
 
       <!-- Right Column: Info & Project description -->
       <section class="control-panel">
+        <!-- Brand Identity Live Preview Card -->
+        <div class="live-identity-card">
+          <div class="identity-selector">
+            <span class="selector-title">Preview Option:</span>
+            <div class="selector-btns">
+              <button id="btn-preview-rect" class="btn-preview active">Rect</button>
+              <button id="btn-preview-rhombus" class="btn-preview">Rhombus</button>
+              <button id="btn-preview-circle" class="btn-preview">Circle</button>
+            </div>
+          </div>
+          <div class="identity-preview-box">
+            <div class="preview-logo-frame">
+              <svg id="preview-logo-svg" viewBox="-4 -4 264 264" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                <!-- Live preview logo renders here -->
+              </svg>
+            </div>
+            <div class="identity-name">DATA WITHIN REACH</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
         <h1>Generative Identity</h1>
         <p class="description">
           A dynamic logo design project inspired by Piet Mondrian's neoplasticism. Consisting of shifting structures representing fluid data patterns and connections brought within reach.
