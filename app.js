@@ -368,13 +368,196 @@ function playTransition(canvas, targetLayout) {
 }
 
 // 3. Exporters
-function exportPng(canvasObj, filename, targetWidth) {
-  // Clone the SVG node so we can manipulate it for high-resolution serialization
-  const clone = canvasObj.svg.cloneNode(true);
+function renderStaticSvg(canvasObj) {
+  // Create a temporary static SVG element
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const themeColors = getThemeColors();
   
-  // Make the clone natively transparent and set high-quality rendering options
-  clone.style.backgroundColor = 'transparent';
-  clone.setAttribute('shape-rendering', 'geometricPrecision');
+  const isLockup = canvasObj.id === 'text';
+  svg.setAttribute('viewBox', isLockup ? '-4 -4 1050 264' : '-4 -4 264 264');
+  svg.style.backgroundColor = 'transparent';
+  svg.setAttribute('shape-rendering', 'geometricPrecision');
+  
+  // Defs & Font styling
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+  style.textContent = `
+    @font-face {
+      font-family: 'Oswald';
+      font-style: normal;
+      font-weight: 300;
+      src: url(data:font/woff2;charset=utf-8;base64,${window.OSWALD_LIGHT_BASE64 || ''}) format('woff2');
+    }
+  `;
+  defs.appendChild(style);
+  
+  const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+  const now = Date.now();
+  clipPath.setAttribute('id', `clip-static-${now}`);
+  
+  if (currentShape === 'rhombus') {
+    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    poly.setAttribute('points', '128,0 256,128 128,256 0,128');
+    clipPath.appendChild(poly);
+  } else if (currentShape === 'circle') {
+    const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circ.setAttribute('cx', 128);
+    circ.setAttribute('cy', 128);
+    circ.setAttribute('r', 128);
+    clipPath.appendChild(circ);
+  } else {
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', 0);
+    rect.setAttribute('y', 0);
+    rect.setAttribute('width', 256);
+    rect.setAttribute('height', 256);
+    clipPath.appendChild(rect);
+  }
+  defs.appendChild(clipPath);
+  svg.appendChild(defs);
+  
+  // Container group if lockup (needed for centering)
+  let containerG = svg;
+  if (isLockup) {
+    containerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    svg.appendChild(containerG);
+  }
+  
+  // Logo drawing group
+  const logoG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  logoG.setAttribute('clip-path', `url(#clip-static-${now})`);
+  if (isLockup) {
+    logoG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
+    containerG.appendChild(logoG);
+  } else {
+    svg.appendChild(logoG);
+  }
+  
+  // Active Layout
+  const layout = canvasObj.currentLayout || generateMondrianLayout();
+  
+  // Render fills at 100% opacity
+  if (layout.rects) {
+    layout.rects.forEach(r => {
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', r.x);
+      rect.setAttribute('y', r.y);
+      rect.setAttribute('width', r.w);
+      rect.setAttribute('height', r.h);
+      let fillVal = themeColors[r.fillKey || 'white'];
+      if (r.fillKey === 'black' && themeColors.blackBlock) {
+        fillVal = themeColors.blackBlock;
+      }
+      rect.setAttribute('fill', fillVal);
+      rect.setAttribute('fill-opacity', '1');
+      rect.setAttribute('stroke', 'none');
+      logoG.appendChild(rect);
+    });
+  }
+  
+  // Render lines at 100% progress
+  if (layout.lines) {
+    layout.lines.forEach(l => {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      if (l.type === 'h') {
+        line.setAttribute('x1', l.start);
+        line.setAttribute('y1', l.val);
+        line.setAttribute('x2', l.end);
+        line.setAttribute('y2', l.val);
+      } else {
+        line.setAttribute('x1', l.val);
+        line.setAttribute('y1', l.start);
+        line.setAttribute('x2', l.val);
+        line.setAttribute('y2', l.end);
+      }
+      const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+      line.setAttribute('stroke', themeColors.black);
+      line.setAttribute('stroke-width', currentStrokeWidth);
+      line.setAttribute('stroke-linecap', 'butt');
+      logoG.appendChild(line);
+    });
+  }
+  
+  // Render perimeter border at 100% progress
+  let border = null;
+  if (currentShape === 'rhombus') {
+    border = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    border.setAttribute('points', '128,0 256,128 128,256 0,128');
+    border.setAttribute('stroke-linejoin', 'round');
+    border.setAttribute('stroke-linecap', 'round');
+  } else if (currentShape === 'circle') {
+    border = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    border.setAttribute('cx', 128);
+    border.setAttribute('cy', 128);
+    border.setAttribute('r', 128);
+    border.setAttribute('stroke-linecap', 'round');
+  } else {
+    border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    border.setAttribute('x', 0);
+    border.setAttribute('y', 0);
+    border.setAttribute('width', 256);
+    border.setAttribute('height', 256);
+    border.setAttribute('stroke-linejoin', 'round');
+    border.setAttribute('stroke-linecap', 'round');
+  }
+  const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+  border.setAttribute('fill', 'none');
+  border.setAttribute('stroke', themeColors.black);
+  border.setAttribute('stroke-width', currentStrokeWidth);
+  
+  if (isLockup) {
+    const borderG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    borderG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
+    borderG.appendChild(border);
+    containerG.appendChild(borderG);
+  } else {
+    svg.appendChild(border);
+  }
+  
+  // Render text
+  if (isLockup) {
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', '140');
+    text.setAttribute('y', '128');
+    text.setAttribute('dy', '8');
+    text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+    text.setAttribute('font-weight', '300');
+    text.setAttribute('font-size', '76');
+    text.setAttribute('fill', themeColors.black);
+    text.setAttribute('letter-spacing', '0.04em');
+    text.setAttribute('alignment-baseline', 'middle');
+    text.textContent = 'DATA WITHIN REACH';
+    containerG.appendChild(text);
+  }
+  
+  // Centering logic: temporarily append to document body to let getBBox function correctly
+  if (isLockup) {
+    // Hide visibility and append to body offscreen
+    svg.style.position = 'absolute';
+    svg.style.visibility = 'hidden';
+    svg.style.pointerEvents = 'none';
+    document.body.appendChild(svg);
+    const bbox = containerG.getBBox();
+    if (bbox.width > 0) {
+      const targetX = (1050 - bbox.width) / 2;
+      const targetY = (264 - bbox.height) / 2;
+      const dx = targetX - bbox.x;
+      const dy = targetY - bbox.y;
+      containerG.setAttribute('transform', `translate(${dx}, ${dy})`);
+    }
+    document.body.removeChild(svg);
+    // Restore static styling
+    svg.style.position = '';
+    svg.style.visibility = '';
+    svg.style.pointerEvents = '';
+  }
+  
+  return svg;
+}
+
+function exportPng(canvasObj, filename, targetWidth) {
+  // Generate a clean completed static representation of the current layout
+  const clone = renderStaticSvg(canvasObj);
   
   const isLockup = canvasObj.id === 'text';
   const aspect = isLockup ? (1050 / 264) : 1;
@@ -454,9 +637,8 @@ function exportPng(canvasObj, filename, targetWidth) {
 }
 
 function exportSvg(canvasObj, filename) {
-  // Clone the SVG node so we can strip the background style
-  const clone = canvasObj.svg.cloneNode(true);
-  clone.style.backgroundColor = 'transparent';
+  // Generate a clean completed static representation of the current layout
+  const clone = renderStaticSvg(canvasObj);
   
   const svgContent = clone.outerHTML;
   const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
