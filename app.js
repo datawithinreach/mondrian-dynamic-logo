@@ -301,11 +301,11 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // D. If lockup, render aligned wordmark text (font-size 76, baseline y=145 for perfect visual centering of Antonio Light)
+    // D. If lockup, render aligned wordmark text (font-size 76, baseline y=155 for perfect visual centering of Antonio Light)
     if (isLockup) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
-      text.setAttribute('y', '145'); // Visually adjusted baseline for Antonio Light vertical centering
+      text.setAttribute('y', '155'); // Balanced baseline y=155 to match the vertical center of the scaled logo
       text.setAttribute('font-family', "'Antonio', -apple-system, sans-serif");
       text.setAttribute('font-weight', '300'); // Antonio Light
       text.setAttribute('font-size', '76');
