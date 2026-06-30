@@ -245,7 +245,7 @@ function playTransition(canvas, targetLayout) {
           line.setAttribute('x2', l.val);
           line.setAttribute('y2', currentEnd);
         }
-        const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+        const currentStrokeWidth = isLockup ? 9 : STROKE_WIDTH;
         line.setAttribute('stroke', themeColors.black);
         line.setAttribute('stroke-width', currentStrokeWidth);
         line.setAttribute('stroke-linecap', 'butt');
@@ -285,7 +285,7 @@ function playTransition(canvas, targetLayout) {
         border.setAttribute('stroke-dasharray', perimeter);
         border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
       }
-      const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+      const currentStrokeWidth = isLockup ? 9 : STROKE_WIDTH;
       border.setAttribute('fill', 'none');
       border.setAttribute('stroke', themeColors.black);
       border.setAttribute('stroke-width', currentStrokeWidth);
@@ -301,13 +301,13 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // D. If lockup, render aligned wordmark text (font-size 76, baseline adjusted to y=154 to center all-caps Bebas Neue perfectly)
+    // D. If lockup, render aligned wordmark text (font-size 76, baseline adjusted to y=155 to center all-caps Raleway perfectly)
     if (isLockup) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
-      text.setAttribute('y', '154'); // Adjusted baseline to account for Bebas Neue cap-height centering
-      text.setAttribute('font-family', "'Bebas Neue', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '400'); // Bebas Neue is regular weight but bold visually
+      text.setAttribute('y', '155'); // Adjusted baseline to account for Raleway cap-height centering
+      text.setAttribute('font-family', "'Raleway', -apple-system, sans-serif");
+      text.setAttribute('font-weight', '300'); // Raleway Light
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
       text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
