@@ -13,7 +13,7 @@ function getThemeColors() {
     return {
       white: '#121318', // deep charcoal background blocks
       black: '#dccaa0', // warm gold grid lines, borders, and text
-      blackBlock: '#adbabc', // light grey filled blocks
+      blackBlock: '#dccaa0', // warm gold filled blocks
       red: '#b30000',   // rich crimson red
       blue: '#467181',  // slate blue
       yellow: '#dda93e' // ochre yellow
