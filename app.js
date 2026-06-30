@@ -13,6 +13,7 @@ function getThemeColors() {
     return {
       white: '#121318', // deep charcoal background blocks
       black: '#dccaa0', // warm gold grid lines, borders, and text
+      blackBlock: '#adbabc', // light grey filled blocks
       red: '#b30000',   // rich crimson red
       blue: '#467181',  // slate blue
       yellow: '#dda93e' // ochre yellow
@@ -21,6 +22,7 @@ function getThemeColors() {
     return {
       white: '#f5f5f7', // classic warm white blocks
       black: '#111112', // classic black borders/lines
+      blackBlock: '#111112', // black filled blocks
       red: '#b30000',   // rich crimson red
       blue: '#467181',  // slate blue
       yellow: '#dda93e' // ochre yellow
@@ -236,7 +238,11 @@ function playTransition(canvas, targetLayout) {
         rect.setAttribute('y', r.y);
         rect.setAttribute('width', r.w);
         rect.setAttribute('height', r.h);
-        rect.setAttribute('fill', themeColors[r.fillKey || 'white']);
+        let fillVal = themeColors[r.fillKey || 'white'];
+        if (r.fillKey === 'black' && themeColors.blackBlock) {
+          fillVal = themeColors.blackBlock;
+        }
+        rect.setAttribute('fill', fillVal);
         rect.setAttribute('fill-opacity', fillOpacity);
         rect.setAttribute('stroke', 'none');
         logoG.appendChild(rect);
