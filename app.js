@@ -12,7 +12,7 @@ function getThemeColors() {
   if (currentTheme === 'dark') {
     return {
       white: '#121318', // deep charcoal background blocks
-      black: '#ffffff', // white grid lines and borders
+      black: '#dccaa0', // warm gold grid lines, borders, and text
       red: '#ff3b30',   // vibrant neon red
       blue: '#0a84ff',  // vibrant neon blue
       yellow: '#ffd60a' // vibrant neon yellow
@@ -442,6 +442,20 @@ function updateGlobalTheme(theme, clickedBtn) {
       playTransition(canv, canv.currentLayout);
     }
   });
+
+  // Dynamically update the header logo text to match the active brand colors
+  const headerLogo = document.querySelector('.header-logo-text');
+  if (headerLogo) {
+    if (theme === 'dark') {
+      headerLogo.style.background = 'none';
+      headerLogo.style.webkitTextFillColor = '#dccaa0';
+      headerLogo.style.color = '#dccaa0';
+    } else {
+      headerLogo.style.background = '';
+      headerLogo.style.webkitTextFillColor = '';
+      headerLogo.style.color = '';
+    }
+  }
 }
 
 // Init Function
