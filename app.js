@@ -1,4 +1,4 @@
-// Mondrian Dynamic Identity Generator - Simplified Focused Previews Engine
+// Mondrian Dynamic Identity Generator - Aligned Wordmark Lockup Update
 const WIDTH = 256;
 const HEIGHT = 256;
 const STROKE_WIDTH = 8;
@@ -178,9 +178,14 @@ function playTransition(canvas, targetLayout) {
     defs.appendChild(clipPath);
     canvas.svg.appendChild(defs);
 
-    // Group for logo drawing (with translation if inside a lockup)
+    // Group for logo drawing (with translation & scale if inside a lockup)
+    // Scale logo down from 256px to 76px to match uppercase text height (font-size: 76)
     const logoG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     logoG.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
+    
+    if (isLockup) {
+      logoG.setAttribute('transform', 'translate(40, 90) scale(0.3)');
+    }
     canvas.svg.appendChild(logoG);
 
     let activeLayout = null;
@@ -247,7 +252,7 @@ function playTransition(canvas, targetLayout) {
       });
     }
 
-    // C. Draw perimeter border
+    // C. Draw perimeter border (apply scale transform if in lockup)
     if (lineProgress > 0) {
       let border = null;
       if (currentShape === 'rhombus') {
@@ -282,19 +287,28 @@ function playTransition(canvas, targetLayout) {
       border.setAttribute('fill', 'none');
       border.setAttribute('stroke', themeColors.black);
       border.setAttribute('stroke-width', STROKE_WIDTH);
-      canvas.svg.appendChild(border);
+      
+      if (isLockup) {
+        // Draw the border scaled inside a container group to match fills/lines perfectly
+        const borderG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        borderG.setAttribute('transform', 'translate(40, 90) scale(0.3)');
+        borderG.appendChild(border);
+        canvas.svg.appendChild(borderG);
+      } else {
+        canvas.svg.appendChild(border);
+      }
     }
 
-    // D. If lockup, render full wordmark text
+    // D. If lockup, render aligned wordmark text (font-size 76, top of text aligns visually with logo top at y=90)
     if (isLockup) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', '290');
+      text.setAttribute('x', '140');
       text.setAttribute('y', '152');
       text.setAttribute('font-family', "'Inter', -apple-system, sans-serif");
       text.setAttribute('font-weight', '900');
-      text.setAttribute('font-size', '44');
+      text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
-      text.setAttribute('letter-spacing', '-0.02em');
+      text.setAttribute('letter-spacing', '-0.025em');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
     }
@@ -374,6 +388,7 @@ function updateGlobalShape(shape, clickedBtn) {
   });
 }
 
+// Theme Switcher
 function updateGlobalTheme(theme, clickedBtn) {
   if (currentTheme === theme) return;
   currentTheme = theme;
@@ -385,7 +400,6 @@ function updateGlobalTheme(theme, clickedBtn) {
 
   const colors = getThemeColors();
 
-  // Adjust preview frame containers backgrounds and trigger redraw
   ALL_CANVASES.forEach(canv => {
     canv.svg.parentElement.style.backgroundColor = colors.white;
     canv.svg.style.backgroundColor = colors.white;
@@ -395,28 +409,35 @@ function updateGlobalTheme(theme, clickedBtn) {
   });
 }
 
+// Setup Synchronized Preview Autoplay
+let previewAutoplayInt = null;
+function startPreviewAutoplay() {
+  if (previewAutoplayInt) clearInterval(previewAutoplayInt);
+  
+  previewAutoplayInt = setInterval(() => {
+    const sharedLayout = generateMondrianLayout();
+    playTransition(canvOnly, sharedLayout);
+    playTransition(canvText, sharedLayout);
+  }, 3000);
+}
+
 // Init Function
 function init() {
-  // Shape Event Attachments
   document.getElementById('btn-global-rect').addEventListener('click', (e) => updateGlobalShape(null, e.currentTarget));
   document.getElementById('btn-global-rhombus').addEventListener('click', (e) => updateGlobalShape('rhombus', e.currentTarget));
   document.getElementById('btn-global-circle').addEventListener('click', (e) => updateGlobalShape('circle', e.currentTarget));
 
-  // Theme Event Attachments
   document.getElementById('btn-global-light').addEventListener('click', (e) => updateGlobalTheme('light', e.currentTarget));
   document.getElementById('btn-global-dark').addEventListener('click', (e) => updateGlobalTheme('dark', e.currentTarget));
 
-  // Canvas-Specific Loops & Control Bindings
   ALL_CANVASES.forEach(canv => {
     const initial = generateMondrianLayout();
     playTransition(canv, initial);
 
-    // Manual next layout trigger
     canv.btnNext.addEventListener('click', () => {
       playTransition(canv, generateMondrianLayout());
     });
 
-    // Autoplay trigger
     canv.btnAutoplay.addEventListener('click', () => {
       canv.isAutoplay = !canv.isAutoplay;
       canv.btnAutoplay.classList.toggle('active', canv.isAutoplay);
@@ -429,7 +450,6 @@ function init() {
       }
     });
 
-    // Exports attachments
     canv.btnExportSvg.addEventListener('click', () => {
       const suffix = canv.id === 'text' ? 'brand_lockup' : 'standalone';
       exportSvg(canv, `data_within_reach_${suffix}.svg`);
@@ -443,6 +463,8 @@ function init() {
       exportPng(canv, `data_within_reach_${suffix}_1024.png`, 1024);
     });
   });
+
+  startPreviewAutoplay();
 }
 
 init();
