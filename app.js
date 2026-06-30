@@ -317,7 +317,7 @@ function playTransition(canvas, targetLayout) {
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
       text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
-      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('alignment-baseline', 'middle');
       text.textContent = 'DATA WITHIN REACH';
       canvas.svg.appendChild(text);
     }
