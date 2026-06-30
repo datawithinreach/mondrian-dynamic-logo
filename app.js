@@ -197,13 +197,21 @@ function playTransition(canvas, targetLayout) {
 
     // Group for logo drawing (with translation & scale if inside a lockup)
     // Scale logo down from 256px to 76px to match uppercase text height (font-size: 76)
+    let containerG = null;
+    if (isLockup) {
+      containerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      canvas.svg.appendChild(containerG);
+    }
+
     const logoG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     logoG.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
     
     if (isLockup) {
       logoG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
+      containerG.appendChild(logoG);
+    } else {
+      canvas.svg.appendChild(logoG);
     }
-    canvas.svg.appendChild(logoG);
 
     let activeLayout = null;
     let lineProgress = 0;
@@ -316,7 +324,7 @@ function playTransition(canvas, targetLayout) {
         const borderG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         borderG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
         borderG.appendChild(border);
-        canvas.svg.appendChild(borderG);
+        containerG.appendChild(borderG);
       } else {
         canvas.svg.appendChild(border);
       }
@@ -335,7 +343,17 @@ function playTransition(canvas, targetLayout) {
       text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
       text.setAttribute('alignment-baseline', 'middle');
       text.textContent = 'DATA WITHIN REACH';
-      canvas.svg.appendChild(text);
+      containerG.appendChild(text);
+
+      // Centering logic: calculate bounding box of the lockup content and center it inside the 1050x264 viewBox
+      const bbox = containerG.getBBox();
+      if (bbox.width > 0) {
+        const targetX = (1050 - bbox.width) / 2;
+        const targetY = (264 - bbox.height) / 2;
+        const dx = targetX - bbox.x;
+        const dy = targetY - bbox.y;
+        containerG.setAttribute('transform', `translate(${dx}, ${dy})`);
+      }
     }
 
     if (progress < 1) {
