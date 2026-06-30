@@ -5,7 +5,7 @@ const STROKE_WIDTH = 8;
 const MIN_BLOCK_SIZE = 35;
 
 // Global Settings State
-let currentShape = null; // null = Rect, 'rhombus', 'circle'
+let currentShape = 'circle'; // null = Rect, 'rhombus', 'circle'
 let currentTheme = 'light';
 
 function getThemeColors() {
@@ -312,6 +312,7 @@ function playTransition(canvas, targetLayout) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
       text.setAttribute('y', '128'); // Center line of the 256px logo height space
+      text.setAttribute('dy', '6'); // Finely nudge vertical alignment down for perfect visual center alignment
       text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
       text.setAttribute('font-weight', '300'); // Oswald Light
       text.setAttribute('font-size', '76');
