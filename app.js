@@ -301,13 +301,13 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // D. If lockup, render aligned wordmark text (font-size 76, baseline adjusted to y=155 to center all-caps Raleway perfectly)
+    // D. If lockup, render aligned wordmark text (font-size 76, baseline adjusted to y=154 to center all-caps Oswald perfectly)
     if (isLockup) {
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', '140');
-      text.setAttribute('y', '155'); // Adjusted baseline to account for Raleway cap-height centering
-      text.setAttribute('font-family', "'Raleway', -apple-system, sans-serif");
-      text.setAttribute('font-weight', '300'); // Raleway Light
+      text.setAttribute('y', '154'); // Adjusted baseline to account for Oswald cap-height centering
+      text.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+      text.setAttribute('font-weight', '300'); // Oswald Light
       text.setAttribute('font-size', '76');
       text.setAttribute('fill', themeColors.black);
       text.setAttribute('letter-spacing', '0.04em'); // Expand letter spacing for premium display feel
