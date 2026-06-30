@@ -367,23 +367,26 @@ function exportPng(canvasObj, filename, targetWidth) {
   
   const image = new Image();
   image.onload = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const context = canvas.getContext('2d');
-    
-    // Draw directly onto the transparent canvas context
-    context.clearRect(0, 0, w, h);
-    context.drawImage(image, 0, 0, w, h);
-    
-    const pngURL = canvas.toDataURL('image/png');
-    const downloadLink = document.createElement('a');
-    downloadLink.href = pngURL;
-    downloadLink.download = filename;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    URL.revokeObjectURL(blobURL);
+    // Add a short delay to ensure the inlined base64 web font has finished decoding and layout activation before drawing to canvas
+    setTimeout(() => {
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const context = canvas.getContext('2d');
+      
+      // Draw directly onto the transparent canvas context
+      context.clearRect(0, 0, w, h);
+      context.drawImage(image, 0, 0, w, h);
+      
+      const pngURL = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pngURL;
+      downloadLink.download = filename;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(blobURL);
+    }, 100);
   };
   image.src = blobURL;
 }
