@@ -1,4 +1,4 @@
-// Mondrian Dynamic Identity Generator - Live Identity Preview Update
+// Mondrian Dynamic Identity Generator - Restructured Sandbox Preview Update
 const WIDTH = 256;
 const HEIGHT = 256;
 const STROKE_WIDTH = 8;
@@ -73,17 +73,24 @@ const canvC = {
   clip: 'circle'
 };
 
-const canvPreview = {
-  id: 'preview',
-  svg: document.getElementById('preview-logo-svg'),
+const canvPreviewOnly = {
+  id: 'preview-only',
+  svg: document.getElementById('preview-logo-only'),
   currentLayout: null,
   animId: null,
-  autoplayInt: null,
-  isAutoplay: true,
-  clip: null // null = Rect, 'rhombus', 'circle'
+  clip: null // Updated dynamically
 };
 
-const ALL_CANVASES = [canvA, canvB, canvC, canvPreview];
+const canvPreviewText = {
+  id: 'preview-text',
+  svg: document.getElementById('preview-logo-text'),
+  currentLayout: null,
+  animId: null,
+  clip: null // Updated dynamically
+};
+
+const ALL_CANVASES = [canvA, canvB, canvC, canvPreviewOnly, canvPreviewText];
+const PREVIEW_CANVASES = [canvPreviewOnly, canvPreviewText];
 const INTERACTIVE_CANVASES = [canvA, canvB, canvC];
 
 // 1. Recursive Subdivision Generator
@@ -388,8 +395,8 @@ function updateLogoTheme(theme) {
   if (currentTheme === theme) return;
   currentTheme = theme;
 
-  document.getElementById('btn-theme-light').classList.toggle('active-theme', theme === 'light');
-  document.getElementById('btn-theme-dark').classList.toggle('active-theme', theme === 'dark');
+  document.getElementById('btn-sb-light').classList.toggle('active', theme === 'light');
+  document.getElementById('btn-sb-dark').classList.toggle('active', theme === 'dark');
 
   const colors = getThemeColors();
 
@@ -402,32 +409,40 @@ function updateLogoTheme(theme) {
   });
 }
 
-// Setup Preview Autoplay
+// Setup Synchronized Preview Autoplay
+let previewAutoplayInt = null;
 function startPreviewAutoplay() {
-  if (canvPreview.autoplayInt) clearInterval(canvPreview.autoplayInt);
-  canvPreview.autoplayInt = setInterval(() => {
-    playTransition(canvPreview, generateMondrianLayout());
+  if (previewAutoplayInt) clearInterval(previewAutoplayInt);
+  
+  previewAutoplayInt = setInterval(() => {
+    // Generate a single synchronized layout for both preview states
+    const sharedLayout = generateMondrianLayout();
+    playTransition(canvPreviewOnly, sharedLayout);
+    playTransition(canvPreviewText, sharedLayout);
   }, 3000);
 }
 
 // Initial setup
 function init() {
   // Theme listeners
-  document.getElementById('btn-theme-light').addEventListener('click', () => updateLogoTheme('light'));
-  document.getElementById('btn-theme-dark').addEventListener('click', () => updateLogoTheme('dark'));
+  document.getElementById('btn-sb-light').addEventListener('click', () => updateLogoTheme('light'));
+  document.getElementById('btn-sb-dark').addEventListener('click', () => updateLogoTheme('dark'));
 
   // Preview shape selectors
-  const btnPrevRect = document.getElementById('btn-preview-rect');
-  const btnPrevRhombus = document.getElementById('btn-preview-rhombus');
-  const btnPrevCircle = document.getElementById('btn-preview-circle');
+  const btnPrevRect = document.getElementById('btn-sb-rect');
+  const btnPrevRhombus = document.getElementById('btn-sb-rhombus');
+  const btnPrevCircle = document.getElementById('btn-sb-circle');
 
   function updatePreviewClip(clipType, clickedBtn) {
-    canvPreview.clip = clipType;
+    [canvPreviewOnly, canvPreviewText].forEach(canv => canv.clip = clipType);
     [btnPrevRect, btnPrevRhombus, btnPrevCircle].forEach(btn => btn.classList.remove('active'));
     clickedBtn.classList.add('active');
     
     // Play transition instantly with a new layout
-    playTransition(canvPreview, generateMondrianLayout());
+    const newLayout = generateMondrianLayout();
+    playTransition(canvPreviewOnly, newLayout);
+    playTransition(canvPreviewText, newLayout);
+    
     // Reset autoplay timer
     startPreviewAutoplay();
   }

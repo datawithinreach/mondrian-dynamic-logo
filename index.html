@@ -184,23 +184,51 @@
 
       <!-- Right Column: Info & Project description -->
       <section class="control-panel">
-        <!-- Brand Identity Live Preview Card -->
+        <!-- Brand Identity Preview Sandbox -->
         <div class="live-identity-card">
-          <div class="identity-selector">
-            <span class="selector-title">Preview Option:</span>
-            <div class="selector-btns">
-              <button id="btn-preview-rect" class="btn-preview active">Rect</button>
-              <button id="btn-preview-rhombus" class="btn-preview">Rhombus</button>
-              <button id="btn-preview-circle" class="btn-preview">Circle</button>
+          <div class="sandbox-controls">
+            <!-- Shape Controls -->
+            <div class="control-group">
+              <span class="control-label">Shape</span>
+              <div class="btn-group">
+                <button id="btn-sb-rect" class="btn-sb active">Rect</button>
+                <button id="btn-sb-rhombus" class="btn-sb">Rhombus</button>
+                <button id="btn-sb-circle" class="btn-sb">Circle</button>
+              </div>
+            </div>
+            <!-- Theme Controls -->
+            <div class="control-group">
+              <span class="control-label">Theme</span>
+              <div class="btn-group">
+                <button id="btn-sb-light" class="btn-sb active">Light</button>
+                <button id="btn-sb-dark" class="btn-sb">Dark</button>
+              </div>
             </div>
           </div>
-          <div class="identity-preview-box">
-            <div class="preview-logo-frame">
-              <svg id="preview-logo-svg" viewBox="-4 -4 264 264" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-                <!-- Live preview logo renders here -->
-              </svg>
+          
+          <div class="sandbox-previews">
+            <!-- Configuration 1: Just Logo -->
+            <div class="preview-item">
+              <span class="preview-label">Just Logo</span>
+              <div class="preview-logo-frame">
+                <svg id="preview-logo-only" viewBox="-4 -4 264 264" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Standalone dynamic logo -->
+                </svg>
+              </div>
             </div>
-            <div class="identity-name">DATA WITHIN REACH</div>
+            
+            <!-- Configuration 2: Logo + Full Group Name -->
+            <div class="preview-item">
+              <span class="preview-label">Logo + Full Group Name</span>
+              <div class="lockup-box">
+                <div class="preview-logo-frame">
+                  <svg id="preview-logo-text" viewBox="-4 -4 264 264" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Lockup dynamic logo -->
+                  </svg>
+                </div>
+                <div class="identity-name">DATA WITHIN REACH</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -210,21 +238,6 @@
         <p class="description">
           A dynamic logo design project inspired by Piet Mondrian's neoplasticism. Consisting of shifting structures representing fluid data patterns and connections brought within reach.
         </p>
-
-        <!-- Logo Theme Toggle -->
-        <div class="theme-section">
-          <h2>Logo Theme</h2>
-          <div class="theme-buttons">
-            <button id="btn-theme-light" class="btn outline-btn btn-sm active-theme">
-              Classic Light
-            </button>
-            <button id="btn-theme-dark" class="btn outline-btn btn-sm">
-              Midnight Dark
-            </button>
-          </div>
-        </div>
-
-        <div class="divider"></div>
 
         <div class="concept-details">
           <div class="concept-point">
