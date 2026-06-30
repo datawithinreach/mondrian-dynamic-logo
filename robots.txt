@@ -1,0 +1,17 @@
+# robots.txt for https://dwr.bc.edu/mondrian-dynamic-logo/
+
+User-agent: *
+Allow: /
+
+# Specifically welcome AI Crawler bots
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
