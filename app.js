@@ -581,26 +581,28 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // E. If monogram or split shape monogram, render centered uppercase monogram "DWR" with crisp drop shadow (dx=2, dy=2)
+    // E. If monogram or split shape monogram, render centered uppercase monogram "DWR"
     if (canvas.id === 'monogram' || canvas.id === 'geom') {
       const isDark = currentTheme === 'dark';
       const shadowColor = isDark ? '#121318' : '#ffffff';
       const frontColor = isDark ? '#dccaa0' : '#111112';
       const fontSize = canvas.id === 'geom' ? '84' : '110';
 
-      // 1. Draw drop shadow text first (offset by dx=2, dy=2)
-      const shadowText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      shadowText.setAttribute('x', '130'); // 128 + 2
-      shadowText.setAttribute('y', '128'); // 128 + 2
-      shadowText.setAttribute('dy', '10'); // 8 + 2 vertical offset
-      shadowText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
-      shadowText.setAttribute('font-weight', '300'); // Oswald Light
-      shadowText.setAttribute('font-size', fontSize);
-      shadowText.setAttribute('fill', shadowColor);
-      shadowText.setAttribute('text-anchor', 'middle');
-      shadowText.setAttribute('alignment-baseline', 'middle');
-      shadowText.textContent = 'DWR';
-      canvas.svg.appendChild(shadowText);
+      // 1. Draw drop shadow text first (offset by dx=2, dy=2) - Only for standard monogram overlay
+      if (canvas.id === 'monogram') {
+        const shadowText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        shadowText.setAttribute('x', '130'); // 128 + 2
+        shadowText.setAttribute('y', '128'); // 128 + 2
+        shadowText.setAttribute('dy', '10'); // 8 + 2 vertical offset
+        shadowText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+        shadowText.setAttribute('font-weight', '300'); // Oswald Light
+        shadowText.setAttribute('font-size', fontSize);
+        shadowText.setAttribute('fill', shadowColor);
+        shadowText.setAttribute('text-anchor', 'middle');
+        shadowText.setAttribute('alignment-baseline', 'middle');
+        shadowText.textContent = 'DWR';
+        canvas.svg.appendChild(shadowText);
+      }
 
       // 2. Draw front text
       const frontText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
