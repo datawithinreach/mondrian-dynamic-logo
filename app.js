@@ -95,18 +95,18 @@ const ALL_CANVASES = [canvOnly, canvText, canvMonogram, canvGeom];
 
 // 1. Recursive Subdivision Generator
 function generateMondrianLayout(isSplit = false, shape = 'rect') {
-  function getSinglePiece(w, h, startX, startY) {
+  function getSinglePiece(w, h, startX, startY, isSplitPiece = false) {
     const rects = [];
     const lines = [];
 
     function split(x, y, w, h, depth) {
-      // Use smaller block size for independent pieces so they can successfully subdivide
-      const minBlock = 20;
+      // Keep split shape segments visually clean and minimal with larger block sizes and strict depth limits
+      const minBlock = isSplitPiece ? 32 : 20;
       const canSplitH = h >= minBlock * 2;
       const canSplitV = w >= minBlock * 2;
-      const forceStop = w < 40 && h < 40;
-      const randomStop = depth > 1 && Math.random() > 0.45;
-      const mustStop = depth >= 3;
+      const forceStop = isSplitPiece ? (w < 50 && h < 50) : (w < 40 && h < 40);
+      const randomStop = isSplitPiece ? (depth > 0 && Math.random() > 0.2) : (depth > 1 && Math.random() > 0.45);
+      const mustStop = isSplitPiece ? (depth >= 2) : (depth >= 3);
 
       if (forceStop || mustStop || (!canSplitH && !canSplitV) || (depth > 0 && randomStop)) {
         rects.push({ x, y, w, h, depth });
@@ -165,16 +165,16 @@ function generateMondrianLayout(isSplit = false, shape = 'rect') {
     const combined = { rects: [], lines: [] };
     if (shape === 'rhombus') {
       // 4 independent pieces: top, bottom, left, right
-      const p1 = getSinglePiece(176, 88, 40, 0);
-      const p2 = getSinglePiece(176, 88, 40, 168);
-      const p3 = getSinglePiece(56, 112, 0, 72);
-      const p4 = getSinglePiece(56, 112, 200, 72);
+      const p1 = getSinglePiece(176, 88, 40, 0, true);
+      const p2 = getSinglePiece(176, 88, 40, 168, true);
+      const p3 = getSinglePiece(56, 112, 0, 72, true);
+      const p4 = getSinglePiece(56, 112, 200, 72, true);
       combined.rects.push(...p1.rects, ...p2.rects, ...p3.rects, ...p4.rects);
       combined.lines.push(...p1.lines, ...p2.lines, ...p3.lines, ...p4.lines);
     } else {
       // Circle or Rectangle: 2 independent pieces (top and bottom halves)
-      const p1 = getSinglePiece(256, 88, 0, 0);
-      const p2 = getSinglePiece(256, 88, 0, 168);
+      const p1 = getSinglePiece(256, 88, 0, 0, true);
+      const p2 = getSinglePiece(256, 88, 0, 168, true);
       combined.rects.push(...p1.rects, ...p2.rects);
       combined.lines.push(...p1.lines, ...p2.lines);
     }
