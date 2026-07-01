@@ -171,8 +171,14 @@ function generateMondrianLayout(isSplit = false, shape = 'rect') {
       const p4 = getSinglePiece(40, 80, 216, 88, true);
       combined.rects.push(...p1.rects, ...p2.rects, ...p3.rects, ...p4.rects);
       combined.lines.push(...p1.lines, ...p2.lines, ...p3.lines, ...p4.lines);
+    } else if (shape === 'circle') {
+      // Circle: 2 smaller independent pieces (y=76 and y=180 cuts for a 104px gap)
+      const p1 = getSinglePiece(234, 76, 11, 0, true);
+      const p2 = getSinglePiece(234, 76, 11, 180, true);
+      combined.rects.push(...p1.rects, ...p2.rects);
+      combined.lines.push(...p1.lines, ...p2.lines);
     } else {
-      // Circle or Rectangle: 2 independent pieces (top and bottom halves)
+      // Rectangle: 2 independent pieces (top and bottom halves, y=88 and y=168 cuts)
       const p1 = getSinglePiece(256, 88, 0, 0, true);
       const p2 = getSinglePiece(256, 88, 0, 168, true);
       combined.rects.push(...p1.rects, ...p2.rects);
@@ -216,20 +222,20 @@ function getSplitPieces(now, themeColors, strokeWidth) {
       { id: 'right', clip: rightClip, border: rightBorder, perimeter: 193 }
     );
   } else if (currentShape === 'circle') {
-    // 2 independent pieces: top and bottom half-circles
+    // 2 smaller independent pieces: top and bottom circular segments (y=76 and y=180 cuts)
     const topClip = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    topClip.setAttribute('d', 'M 0,88 A 128,128 0 0,1 256,88 Z');
+    topClip.setAttribute('d', 'M 11,76 A 128,128 0 0,1 245,76 Z');
     const topBorder = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    topBorder.setAttribute('d', 'M 0,88 A 128,128 0 0,1 256,88 Z');
+    topBorder.setAttribute('d', 'M 11,76 A 128,128 0 0,1 245,76 Z');
 
     const botClip = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    botClip.setAttribute('d', 'M 256,168 A 128,128 0 0,1 0,168 Z');
+    botClip.setAttribute('d', 'M 245,180 A 128,128 0 0,1 11,180 Z');
     const botBorder = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    botBorder.setAttribute('d', 'M 256,168 A 128,128 0 0,1 0,168 Z');
+    botBorder.setAttribute('d', 'M 245,180 A 128,128 0 0,1 11,180 Z');
 
     pieces.push(
-      { id: 'top', clip: topClip, border: topBorder, perimeter: 536 },
-      { id: 'bottom', clip: botClip, border: botBorder, perimeter: 536 }
+      { id: 'top', clip: topClip, border: topBorder, perimeter: 537 },
+      { id: 'bottom', clip: botClip, border: botBorder, perimeter: 537 }
     );
   } else {
     // 2 independent pieces: top and bottom rectangles
