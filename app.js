@@ -586,24 +586,20 @@ function playTransition(canvas, targetLayout) {
       const frontColor = isDark ? '#dccaa0' : '#111112';
       const fontSize = canvas.id === 'geom' ? '84' : '110';
 
-      // 1. Draw halo background text first - Only for standard monogram overlay
+      // 1. Draw drop shadow text first (offset by dx=2, dy=2) - Only for standard monogram overlay
       if (canvas.id === 'monogram') {
-        const haloText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        haloText.setAttribute('x', '128');
-        haloText.setAttribute('y', '128');
-        haloText.setAttribute('dy', '8');
-        haloText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
-        haloText.setAttribute('font-weight', '300'); // Oswald Light
-        haloText.setAttribute('font-size', fontSize);
-        haloText.setAttribute('fill', shadowColor);
-        haloText.setAttribute('stroke', shadowColor);
-        haloText.setAttribute('stroke-width', '16');
-        haloText.setAttribute('stroke-linejoin', 'round');
-        haloText.setAttribute('stroke-linecap', 'round');
-        haloText.setAttribute('text-anchor', 'middle');
-        haloText.setAttribute('alignment-baseline', 'middle');
-        haloText.textContent = 'DWR';
-        canvas.svg.appendChild(haloText);
+        const shadowText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        shadowText.setAttribute('x', '130'); // 128 + 2
+        shadowText.setAttribute('y', '128'); // 128 + 2
+        shadowText.setAttribute('dy', '10'); // 8 + 2 vertical offset
+        shadowText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
+        shadowText.setAttribute('font-weight', '300'); // Oswald Light
+        shadowText.setAttribute('font-size', fontSize);
+        shadowText.setAttribute('fill', shadowColor);
+        shadowText.setAttribute('text-anchor', 'middle');
+        shadowText.setAttribute('alignment-baseline', 'middle');
+        shadowText.textContent = 'DWR';
+        canvas.svg.appendChild(shadowText);
       }
 
       // 2. Draw front text
