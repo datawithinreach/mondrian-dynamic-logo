@@ -185,6 +185,93 @@ function generateMondrianLayout(isSplit = false, shape = 'rect') {
   return getSinglePiece(256, 256, 0, 0);
 }
 
+function getSplitPieces(now, themeColors, strokeWidth) {
+  const pieces = [];
+  if (currentShape === 'rhombus') {
+    // 4 independent pieces: top, bottom, left, right triangles
+    const topClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    topClip.setAttribute('points', '128,0 216,88 40,88');
+    const topBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    topBorder.setAttribute('points', '128,0 216,88 40,88');
+
+    const botClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    botClip.setAttribute('points', '128,256 216,168 40,168');
+    const botBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    botBorder.setAttribute('points', '128,256 216,168 40,168');
+
+    const leftClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    leftClip.setAttribute('points', '0,128 56,184 56,72');
+    const leftBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    leftBorder.setAttribute('points', '0,128 56,184 56,72');
+
+    const rightClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    rightClip.setAttribute('points', '256,128 200,184 200,72');
+    const rightBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    rightBorder.setAttribute('points', '256,128 200,184 200,72');
+
+    pieces.push(
+      { id: 'top', clip: topClip, border: topBorder, perimeter: 432 },
+      { id: 'bottom', clip: botClip, border: botBorder, perimeter: 432 },
+      { id: 'left', clip: leftClip, border: leftBorder, perimeter: 312 },
+      { id: 'right', clip: rightClip, border: rightBorder, perimeter: 312 }
+    );
+  } else if (currentShape === 'circle') {
+    // 2 independent pieces: top and bottom half-circles
+    const topClip = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    topClip.setAttribute('d', 'M 0,88 A 128,128 0 0,1 256,88 Z');
+    const topBorder = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    topBorder.setAttribute('d', 'M 0,88 A 128,128 0 0,1 256,88 Z');
+
+    const botClip = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    botClip.setAttribute('d', 'M 256,168 A 128,128 0 0,1 0,168 Z');
+    const botBorder = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    botBorder.setAttribute('d', 'M 256,168 A 128,128 0 0,1 0,168 Z');
+
+    pieces.push(
+      { id: 'top', clip: topClip, border: topBorder, perimeter: 536 },
+      { id: 'bottom', clip: botClip, border: botBorder, perimeter: 536 }
+    );
+  } else {
+    // 2 independent pieces: top and bottom rectangles
+    const topClip = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    topClip.setAttribute('x', '0');
+    topClip.setAttribute('y', '0');
+    topClip.setAttribute('width', '256');
+    topClip.setAttribute('height', '88');
+    const topBorder = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    topBorder.setAttribute('x', '0');
+    topBorder.setAttribute('y', '0');
+    topBorder.setAttribute('width', '256');
+    topBorder.setAttribute('height', '88');
+
+    const botClip = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    botClip.setAttribute('x', '0');
+    botClip.setAttribute('y', '168');
+    botClip.setAttribute('width', '256');
+    botClip.setAttribute('height', '88');
+    const botBorder = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    botBorder.setAttribute('x', '0');
+    botBorder.setAttribute('y', '168');
+    botBorder.setAttribute('width', '256');
+    botBorder.setAttribute('height', '88');
+
+    pieces.push(
+      { id: 'top', clip: topClip, border: topBorder, perimeter: 688 },
+      { id: 'bottom', clip: botClip, border: botBorder, perimeter: 688 }
+    );
+  }
+
+  pieces.forEach(p => {
+    p.border.setAttribute('fill', 'none');
+    p.border.setAttribute('stroke', themeColors.black);
+    p.border.setAttribute('stroke-width', strokeWidth);
+    p.border.setAttribute('stroke-linejoin', 'round');
+    p.border.setAttribute('stroke-linecap', 'round');
+  });
+
+  return pieces;
+}
+
 // 2. Play Dynamic Exit -> Enter Sequence
 function playTransition(canvas, targetLayout) {
   const startTime = performance.now();
@@ -251,40 +338,6 @@ function playTransition(canvas, targetLayout) {
     }
     defs.appendChild(clipPath);
 
-    if (canvas.id === 'geom') {
-      const splitClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-      splitClip.setAttribute('id', `clip-split-${canvas.id}-${now}`);
-      if (currentShape === 'rhombus') {
-        // 4 pieces: top, bottom, left, right triangles ending close to the text boundaries
-        const poly1 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly1.setAttribute('points', '128,0 216,88 40,88');
-        const poly2 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly2.setAttribute('points', '128,256 216,168 40,168');
-        const poly3 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly3.setAttribute('points', '0,128 56,72 56,184');
-        const poly4 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly4.setAttribute('points', '256,128 200,72 200,184');
-        splitClip.appendChild(poly1);
-        splitClip.appendChild(poly2);
-        splitClip.appendChild(poly3);
-        splitClip.appendChild(poly4);
-      } else {
-        // Circle or Rectangle: top and bottom halves with an 80px gap in the middle
-        const rect1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect1.setAttribute('x', '0');
-        rect1.setAttribute('y', '0');
-        rect1.setAttribute('width', '256');
-        rect1.setAttribute('height', '88');
-        const rect2 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect2.setAttribute('x', '0');
-        rect2.setAttribute('y', '168');
-        rect2.setAttribute('width', '256');
-        rect2.setAttribute('height', '88');
-        splitClip.appendChild(rect1);
-        splitClip.appendChild(rect2);
-      }
-      defs.appendChild(splitClip);
-    }
     canvas.svg.appendChild(defs);
 
     // Group for logo drawing (with translation & scale if inside a lockup)
@@ -293,25 +346,6 @@ function playTransition(canvas, targetLayout) {
     if (isLockup) {
       containerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       canvas.svg.appendChild(containerG);
-    }
-
-    const logoG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    logoG.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
-    
-    // Nest inner group with split clip-path if we are in Configuration 4
-    let drawG = logoG;
-    if (canvas.id === 'geom') {
-      const splitG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      splitG.setAttribute('clip-path', `url(#clip-split-${canvas.id}-${now})`);
-      logoG.appendChild(splitG);
-      drawG = splitG;
-    }
-    
-    if (isLockup) {
-      logoG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
-      containerG.appendChild(logoG);
-    } else {
-      canvas.svg.appendChild(logoG);
     }
 
     let activeLayout = null;
@@ -339,97 +373,182 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // A. Render fills
-    if (fillOpacity > 0 && activeLayout.rects) {
-      activeLayout.rects.forEach(r => {
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', r.x);
-        rect.setAttribute('y', r.y);
-        rect.setAttribute('width', r.w);
-        rect.setAttribute('height', r.h);
-        let fillVal = themeColors[r.fillKey || 'white'];
-        if (r.fillKey === 'black' && themeColors.blackBlock) {
-          fillVal = themeColors.blackBlock;
-        }
-        rect.setAttribute('fill', fillVal);
-        rect.setAttribute('fill-opacity', fillOpacity);
-        rect.setAttribute('stroke', 'none');
-        drawG.appendChild(rect);
-      });
-    }
+    if (canvas.id === 'geom') {
+      const pieces = getSplitPieces(now, themeColors, STROKE_WIDTH);
+      pieces.forEach(p => {
+        // 1. Setup a unique clip path for this specific piece
+        const pClipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+        pClipPath.setAttribute('id', `clip-geom-${p.id}-${now}`);
+        pClipPath.appendChild(p.clip);
+        defs.appendChild(pClipPath);
 
-    // B. Render internal lines
-    if (lineProgress > 0 && activeLayout.lines) {
-      activeLayout.lines.forEach(l => {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        if (l.type === 'h') {
-          const currentEnd = l.start + (l.end - l.start) * lineProgress;
-          line.setAttribute('x1', l.start);
-          line.setAttribute('y1', l.val);
-          line.setAttribute('x2', currentEnd);
-          line.setAttribute('y2', l.val);
-        } else {
-          const currentEnd = l.start + (l.end - l.start) * lineProgress;
-          line.setAttribute('x1', l.val);
-          line.setAttribute('y1', l.start);
-          line.setAttribute('x2', l.val);
-          line.setAttribute('y2', currentEnd);
-        }
-        const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
-        line.setAttribute('stroke', themeColors.black);
-        line.setAttribute('stroke-width', currentStrokeWidth);
-        line.setAttribute('stroke-linecap', 'butt');
-        drawG.appendChild(line);
-      });
-    }
+        // 2. Setup a group for this piece's internal fills & lines
+        const pG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        pG.setAttribute('clip-path', `url(#clip-geom-${p.id}-${now})`);
+        canvas.svg.appendChild(pG);
 
-    // C. Draw perimeter border (apply scale transform if in lockup)
-    if (lineProgress > 0) {
-      let border = null;
-      if (currentShape === 'rhombus') {
-        border = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        border.setAttribute('points', '128,0 256,128 128,256 0,128');
-        border.setAttribute('stroke-linejoin', 'round');
-        border.setAttribute('stroke-linecap', 'round');
-        const perimeter = 724.0;
-        border.setAttribute('stroke-dasharray', perimeter);
-        border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
-      } else if (currentShape === 'circle') {
-        border = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        border.setAttribute('cx', 128);
-        border.setAttribute('cy', 128);
-        border.setAttribute('r', 128);
-        border.setAttribute('stroke-linecap', 'round');
-        const perimeter = 804.2;
-        border.setAttribute('stroke-dasharray', perimeter);
-        border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
-      } else {
-        border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        border.setAttribute('x', 0);
-        border.setAttribute('y', 0);
-        border.setAttribute('width', 256);
-        border.setAttribute('height', 256);
-        border.setAttribute('stroke-linejoin', 'round');
-        border.setAttribute('stroke-linecap', 'round');
-        const perimeter = 1024.0;
-        border.setAttribute('stroke-dasharray', perimeter);
-        border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
+        // Draw fills inside this piece
+        if (fillOpacity > 0 && activeLayout.rects) {
+          activeLayout.rects.forEach(r => {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', r.x);
+            rect.setAttribute('y', r.y);
+            rect.setAttribute('width', r.w);
+            rect.setAttribute('height', r.h);
+            let fillVal = themeColors[r.fillKey || 'white'];
+            if (r.fillKey === 'black' && themeColors.blackBlock) {
+              fillVal = themeColors.blackBlock;
+            }
+            rect.setAttribute('fill', fillVal);
+            rect.setAttribute('fill-opacity', fillOpacity);
+            rect.setAttribute('stroke', 'none');
+            pG.appendChild(rect);
+          });
+        }
+
+        // Draw internal lines inside this piece
+        if (lineProgress > 0 && activeLayout.lines) {
+          activeLayout.lines.forEach(l => {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            if (l.type === 'h') {
+              const currentEnd = l.start + (l.end - l.start) * lineProgress;
+              line.setAttribute('x1', l.start);
+              line.setAttribute('y1', l.val);
+              line.setAttribute('x2', currentEnd);
+              line.setAttribute('y2', l.val);
+            } else {
+              const currentEnd = l.start + (l.end - l.start) * lineProgress;
+              line.setAttribute('x1', l.val);
+              line.setAttribute('y1', l.start);
+              line.setAttribute('x2', l.val);
+              line.setAttribute('y2', currentEnd);
+            }
+            line.setAttribute('stroke', themeColors.black);
+            line.setAttribute('stroke-width', STROKE_WIDTH);
+            line.setAttribute('stroke-linecap', 'butt');
+            pG.appendChild(line);
+          });
+        }
+
+        // 3. Draw closed border outline for this piece
+        if (lineProgress > 0) {
+          p.border.setAttribute('stroke-dasharray', p.perimeter);
+          p.border.setAttribute('stroke-dashoffset', p.perimeter * (1 - lineProgress));
+          canvas.svg.appendChild(p.border);
+        }
+      });
+      canvas.svg.appendChild(defs);
+    } else {
+      canvas.svg.appendChild(defs);
+
+      // Group for logo drawing (with translation & scale if inside a lockup)
+      // Scale logo down from 256px to 76px to match uppercase text height (font-size: 76)
+      let containerG = null;
+      if (isLockup) {
+        containerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        canvas.svg.appendChild(containerG);
       }
-      const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
-      border.setAttribute('fill', 'none');
-      border.setAttribute('stroke', themeColors.black);
-      border.setAttribute('stroke-width', currentStrokeWidth);
+
+      const logoG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      logoG.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
       
       if (isLockup) {
-        // Draw the border scaled inside a container group to match fills/lines perfectly
-        const borderG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        borderG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
-        borderG.appendChild(border);
-        containerG.appendChild(borderG);
-      } else if (canvas.id === 'geom') {
-        drawG.appendChild(border);
+        logoG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
+        containerG.appendChild(logoG);
       } else {
-        canvas.svg.appendChild(border);
+        canvas.svg.appendChild(logoG);
+      }
+
+      // A. Render fills
+      if (fillOpacity > 0 && activeLayout.rects) {
+        activeLayout.rects.forEach(r => {
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', r.x);
+          rect.setAttribute('y', r.y);
+          rect.setAttribute('width', r.w);
+          rect.setAttribute('height', r.h);
+          let fillVal = themeColors[r.fillKey || 'white'];
+          if (r.fillKey === 'black' && themeColors.blackBlock) {
+            fillVal = themeColors.blackBlock;
+          }
+          rect.setAttribute('fill', fillVal);
+          rect.setAttribute('fill-opacity', fillOpacity);
+          rect.setAttribute('stroke', 'none');
+          logoG.appendChild(rect);
+        });
+      }
+
+      // B. Render internal lines
+      if (lineProgress > 0 && activeLayout.lines) {
+        activeLayout.lines.forEach(l => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          if (l.type === 'h') {
+            const currentEnd = l.start + (l.end - l.start) * lineProgress;
+            line.setAttribute('x1', l.start);
+            line.setAttribute('y1', l.val);
+            line.setAttribute('x2', currentEnd);
+            line.setAttribute('y2', l.val);
+          } else {
+            const currentEnd = l.start + (l.end - l.start) * lineProgress;
+            line.setAttribute('x1', l.val);
+            line.setAttribute('y1', l.start);
+            line.setAttribute('x2', l.val);
+            line.setAttribute('y2', currentEnd);
+          }
+          const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+          line.setAttribute('stroke', themeColors.black);
+          line.setAttribute('stroke-width', currentStrokeWidth);
+          line.setAttribute('stroke-linecap', 'butt');
+          logoG.appendChild(line);
+        });
+      }
+
+      // C. Draw perimeter border (apply scale transform if in lockup)
+      if (lineProgress > 0) {
+        let border = null;
+        if (currentShape === 'rhombus') {
+          border = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          border.setAttribute('points', '128,0 256,128 128,256 0,128');
+          border.setAttribute('stroke-linejoin', 'round');
+          border.setAttribute('stroke-linecap', 'round');
+          const perimeter = 724.0;
+          border.setAttribute('stroke-dasharray', perimeter);
+          border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
+        } else if (currentShape === 'circle') {
+          border = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          border.setAttribute('cx', 128);
+          border.setAttribute('cy', 128);
+          border.setAttribute('r', 128);
+          border.setAttribute('stroke-linecap', 'round');
+          const perimeter = 804.2;
+          border.setAttribute('stroke-dasharray', perimeter);
+          border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
+        } else {
+          border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          border.setAttribute('x', 0);
+          border.setAttribute('y', 0);
+          border.setAttribute('width', 256);
+          border.setAttribute('height', 256);
+          border.setAttribute('stroke-linejoin', 'round');
+          border.setAttribute('stroke-linecap', 'round');
+          const perimeter = 1024.0;
+          border.setAttribute('stroke-dasharray', perimeter);
+          border.setAttribute('stroke-dashoffset', perimeter * (1 - lineProgress));
+        }
+        const currentStrokeWidth = isLockup ? 15 : STROKE_WIDTH;
+        border.setAttribute('fill', 'none');
+        border.setAttribute('stroke', themeColors.black);
+        border.setAttribute('stroke-width', currentStrokeWidth);
+        
+        if (isLockup) {
+          // Draw the border scaled inside a container group to match fills/lines perfectly
+          const borderG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          borderG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
+          borderG.appendChild(border);
+          containerG.appendChild(borderG);
+        } else {
+          canvas.svg.appendChild(border);
+        }
       }
     }
 
