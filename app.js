@@ -301,6 +301,7 @@ function playTransition(canvas, targetLayout) {
     // Clear SVG
     canvas.svg.innerHTML = '';
     canvas.svg.style.backgroundColor = themeColors.white;
+    let containerG = null;
 
     // Determine viewBox & root elements
     const isLockup = canvas.id === 'text';
@@ -449,7 +450,6 @@ function playTransition(canvas, targetLayout) {
 
       // Group for logo drawing (with translation & scale if inside a lockup)
       // Scale logo down from 256px to 76px to match uppercase text height (font-size: 76)
-      let containerG = null;
       if (isLockup) {
         containerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         canvas.svg.appendChild(containerG);
