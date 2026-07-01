@@ -345,15 +345,7 @@ function playTransition(canvas, targetLayout) {
     }
     defs.appendChild(clipPath);
 
-    canvas.svg.appendChild(defs);
 
-    // Group for logo drawing (with translation & scale if inside a lockup)
-    // Scale logo down from 256px to 76px to match uppercase text height (font-size: 76)
-    let containerG = null;
-    if (isLockup) {
-      containerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      canvas.svg.appendChild(containerG);
-    }
 
     let activeLayout = null;
     let lineProgress = 0;
