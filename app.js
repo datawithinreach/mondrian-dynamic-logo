@@ -94,68 +94,95 @@ const canvGeom = {
 const ALL_CANVASES = [canvOnly, canvText, canvMonogram, canvGeom];
 
 // 1. Recursive Subdivision Generator
-function generateMondrianLayout() {
-  const rects = [];
-  const lines = [];
+function generateMondrianLayout(isSplit = false, shape = 'rect') {
+  function getSinglePiece(w, h, startX, startY) {
+    const rects = [];
+    const lines = [];
 
-  function split(x, y, w, h, depth) {
-    const canSplitH = h >= MIN_BLOCK_SIZE * 2;
-    const canSplitV = w >= MIN_BLOCK_SIZE * 2;
-    const forceStop = w < 60 && h < 60;
-    const randomStop = depth > 1 && Math.random() > 0.45;
-    const mustStop = depth >= 4;
+    function split(x, y, w, h, depth) {
+      // Use smaller block size for independent pieces so they can successfully subdivide
+      const minBlock = 20;
+      const canSplitH = h >= minBlock * 2;
+      const canSplitV = w >= minBlock * 2;
+      const forceStop = w < 40 && h < 40;
+      const randomStop = depth > 1 && Math.random() > 0.45;
+      const mustStop = depth >= 3;
 
-    if (forceStop || mustStop || (!canSplitH && !canSplitV) || (depth > 0 && randomStop)) {
-      rects.push({ x, y, w, h, depth });
-      return;
+      if (forceStop || mustStop || (!canSplitH && !canSplitV) || (depth > 0 && randomStop)) {
+        rects.push({ x, y, w, h, depth });
+        return;
+      }
+
+      let splitH = Math.random() > 0.5;
+      if (canSplitH && !canSplitV) splitH = true;
+      if (!canSplitH && canSplitV) splitH = false;
+
+      if (splitH) {
+        const splitY = Math.round(y + minBlock + Math.random() * (h - 2 * minBlock));
+        lines.push({ type: 'h', val: splitY, start: x, end: x + w });
+        split(x, y, w, splitY - y, depth + 1);
+        split(x, splitY, w, y + h - splitY, depth + 1);
+      } else {
+        const splitX = Math.round(x + minBlock + Math.random() * (w - 2 * minBlock));
+        lines.push({ type: 'v', val: splitX, start: y, end: y + h });
+        split(x, y, splitX - x, h, depth + 1);
+        split(splitX, y, x + w - splitX, h, depth + 1);
+      }
     }
 
-    let splitH = Math.random() > 0.5;
-    if (canSplitH && !canSplitV) splitH = true;
-    if (!canSplitH && canSplitV) splitH = false;
+    split(startX, startY, w, h, 0);
 
-    if (splitH) {
-      const splitY = Math.round(y + MIN_BLOCK_SIZE + Math.random() * (h - 2 * MIN_BLOCK_SIZE));
-      lines.push({ type: 'h', val: splitY, start: x, end: x + w });
-      split(x, y, w, splitY - y, depth + 1);
-      split(x, splitY, w, y + h - splitY, depth + 1);
+    let hasRed = false, hasBlue = false, hasYellow = false, hasBlack = false;
+    const shuffled = [...rects].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach((r) => {
+      let fillKey = 'white';
+      const rand = Math.random();
+      if (!hasRed && rand < 0.2) {
+        fillKey = 'red';
+        hasRed = true;
+      } else if (!hasBlue && rand < 0.35) {
+        fillKey = 'blue';
+        hasBlue = true;
+      } else if (!hasYellow && rand < 0.55) {
+        fillKey = 'yellow';
+        hasYellow = true;
+      } else if (!hasBlack && rand < 0.65 && r.w * r.h < 5000) {
+        fillKey = 'black';
+        hasBlack = true;
+      }
+      r.fillKey = fillKey;
+    });
+
+    if (!hasRed && !hasBlue && !hasYellow && shuffled.length > 0) {
+      shuffled[0].fillKey = 'red';
+    }
+
+    return { rects, lines };
+  }
+
+  if (isSplit) {
+    const combined = { rects: [], lines: [] };
+    if (shape === 'rhombus') {
+      // 4 independent pieces: top, bottom, left, right
+      const p1 = getSinglePiece(176, 88, 40, 0);
+      const p2 = getSinglePiece(176, 88, 40, 168);
+      const p3 = getSinglePiece(56, 112, 0, 72);
+      const p4 = getSinglePiece(56, 112, 200, 72);
+      combined.rects.push(...p1.rects, ...p2.rects, ...p3.rects, ...p4.rects);
+      combined.lines.push(...p1.lines, ...p2.lines, ...p3.lines, ...p4.lines);
     } else {
-      const splitX = Math.round(x + MIN_BLOCK_SIZE + Math.random() * (w - 2 * MIN_BLOCK_SIZE));
-      lines.push({ type: 'v', val: splitX, start: y, end: y + h });
-      split(x, y, splitX - x, h, depth + 1);
-      split(splitX, y, x + w - splitX, h, depth + 1);
+      // Circle or Rectangle: 2 independent pieces (top and bottom halves)
+      const p1 = getSinglePiece(256, 88, 0, 0);
+      const p2 = getSinglePiece(256, 88, 0, 168);
+      combined.rects.push(...p1.rects, ...p2.rects);
+      combined.lines.push(...p1.lines, ...p2.lines);
     }
+    return combined;
   }
 
-  split(0, 0, WIDTH, HEIGHT, 0);
-
-  let hasRed = false, hasBlue = false, hasYellow = false, hasBlack = false;
-  const shuffled = [...rects].sort(() => Math.random() - 0.5);
-
-  shuffled.forEach((r) => {
-    let fillKey = 'white';
-    const rand = Math.random();
-    if (!hasRed && rand < 0.2) {
-      fillKey = 'red';
-      hasRed = true;
-    } else if (!hasBlue && rand < 0.35) {
-      fillKey = 'blue';
-      hasBlue = true;
-    } else if (!hasYellow && rand < 0.55) {
-      fillKey = 'yellow';
-      hasYellow = true;
-    } else if (!hasBlack && rand < 0.65 && r.w * r.h < 5000) {
-      fillKey = 'black';
-      hasBlack = true;
-    }
-    r.fillKey = fillKey;
-  });
-
-  if (!hasRed && !hasBlue && !hasYellow) {
-    shuffled[0].fillKey = 'red';
-  }
-
-  return { rects, lines };
+  // Standard 256x256 layout
+  return getSinglePiece(256, 256, 0, 0);
 }
 
 // 2. Play Dynamic Exit -> Enter Sequence
@@ -602,7 +629,7 @@ function updateGlobalShape(shape, clickedBtn) {
 
   // Redraw both previews instantly with new subdivisions
   ALL_CANVASES.forEach(canv => {
-    playTransition(canv, generateMondrianLayout());
+    playTransition(canv, generateMondrianLayout(canv.id === 'geom', currentShape));
   });
 }
 
@@ -652,18 +679,18 @@ function init() {
   const colors = getThemeColors();
   ALL_CANVASES.forEach(canv => {
     canv.svg.parentElement.style.backgroundColor = colors.white;
-    const initial = generateMondrianLayout();
+    const initial = generateMondrianLayout(canv.id === 'geom', currentShape);
     playTransition(canv, initial);
 
     // Initialize Autoplay on page load
     canv.isAutoplay = true;
     canv.btnAutoplay.classList.add('active');
     canv.autoplayInt = setInterval(() => {
-      playTransition(canv, generateMondrianLayout());
+      playTransition(canv, generateMondrianLayout(canv.id === 'geom', currentShape));
     }, 3000);
 
     canv.btnNext.addEventListener('click', () => {
-      playTransition(canv, generateMondrianLayout());
+      playTransition(canv, generateMondrianLayout(canv.id === 'geom', currentShape));
     });
 
     canv.btnAutoplay.addEventListener('click', () => {
@@ -671,7 +698,7 @@ function init() {
       canv.btnAutoplay.classList.toggle('active', canv.isAutoplay);
       if (canv.isAutoplay) {
         canv.autoplayInt = setInterval(() => {
-          playTransition(canv, generateMondrianLayout());
+          playTransition(canv, generateMondrianLayout(canv.id === 'geom', currentShape));
         }, 3000);
       } else {
         clearInterval(canv.autoplayInt);
