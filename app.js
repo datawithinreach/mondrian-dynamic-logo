@@ -228,15 +228,15 @@ function playTransition(canvas, targetLayout) {
       const splitClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
       splitClip.setAttribute('id', `clip-split-${canvas.id}-${now}`);
       if (currentShape === 'rhombus') {
-        // 4 pieces: top, bottom, left, right triangles
+        // 4 pieces: top, bottom, left, right triangles ending close to the text boundaries
         const poly1 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly1.setAttribute('points', '128,0 176,48 80,48');
+        poly1.setAttribute('points', '128,0 216,88 40,88');
         const poly2 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly2.setAttribute('points', '128,256 176,208 80,208');
+        poly2.setAttribute('points', '128,256 216,168 40,168');
         const poly3 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly3.setAttribute('points', '0,128 48,80 48,176');
+        poly3.setAttribute('points', '0,128 56,72 56,184');
         const poly4 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly4.setAttribute('points', '256,128 208,80 208,176');
+        poly4.setAttribute('points', '256,128 200,72 200,184');
         splitClip.appendChild(poly1);
         splitClip.appendChild(poly2);
         splitClip.appendChild(poly3);
