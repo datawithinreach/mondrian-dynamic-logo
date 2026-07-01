@@ -614,7 +614,8 @@ function playTransition(canvas, targetLayout) {
       const frontText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       frontText.setAttribute('x', '128');
       frontText.setAttribute('y', '128');
-      frontText.setAttribute('dy', '8');
+      const dyVal = canvas.id === 'geom' ? '10' : '8';
+      frontText.setAttribute('dy', dyVal);
       frontText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
       frontText.setAttribute('font-weight', '300'); // Oswald Light
       frontText.setAttribute('font-size', fontSize);
