@@ -164,11 +164,11 @@ function generateMondrianLayout(isSplit = false, shape = 'rect') {
   if (isSplit) {
     const combined = { rects: [], lines: [] };
     if (shape === 'rhombus') {
-      // 4 independent pieces: top, bottom, left, right
-      const p1 = getSinglePiece(176, 88, 40, 0, true);
-      const p2 = getSinglePiece(176, 88, 40, 168, true);
-      const p3 = getSinglePiece(56, 112, 0, 72, true);
-      const p4 = getSinglePiece(56, 112, 200, 72, true);
+      // 4 independent pieces: top, bottom, left, right (adjusted to prevent corner overlap)
+      const p1 = getSinglePiece(160, 80, 48, 0, true);
+      const p2 = getSinglePiece(160, 80, 48, 176, true);
+      const p3 = getSinglePiece(40, 80, 0, 88, true);
+      const p4 = getSinglePiece(40, 80, 216, 88, true);
       combined.rects.push(...p1.rects, ...p2.rects, ...p3.rects, ...p4.rects);
       combined.lines.push(...p1.lines, ...p2.lines, ...p3.lines, ...p4.lines);
     } else {
@@ -188,32 +188,32 @@ function generateMondrianLayout(isSplit = false, shape = 'rect') {
 function getSplitPieces(now, themeColors, strokeWidth) {
   const pieces = [];
   if (currentShape === 'rhombus') {
-    // 4 independent pieces: top, bottom, left, right triangles
+    // 4 independent pieces: top, bottom, left, right triangles adjusted to prevent overlap
     const topClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    topClip.setAttribute('points', '128,0 216,88 40,88');
+    topClip.setAttribute('points', '128,0 208,80 48,80');
     const topBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    topBorder.setAttribute('points', '128,0 216,88 40,88');
+    topBorder.setAttribute('points', '128,0 208,80 48,80');
 
     const botClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    botClip.setAttribute('points', '128,256 216,168 40,168');
+    botClip.setAttribute('points', '128,256 208,176 48,176');
     const botBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    botBorder.setAttribute('points', '128,256 216,168 40,168');
+    botBorder.setAttribute('points', '128,256 208,176 48,176');
 
     const leftClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    leftClip.setAttribute('points', '0,128 56,184 56,72');
+    leftClip.setAttribute('points', '0,128 40,168 40,88');
     const leftBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    leftBorder.setAttribute('points', '0,128 56,184 56,72');
+    leftBorder.setAttribute('points', '0,128 40,168 40,88');
 
     const rightClip = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    rightClip.setAttribute('points', '256,128 200,184 200,72');
+    rightClip.setAttribute('points', '256,128 216,168 216,88');
     const rightBorder = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    rightBorder.setAttribute('points', '256,128 200,184 200,72');
+    rightBorder.setAttribute('points', '256,128 216,168 216,88');
 
     pieces.push(
-      { id: 'top', clip: topClip, border: topBorder, perimeter: 432 },
-      { id: 'bottom', clip: botClip, border: botBorder, perimeter: 432 },
-      { id: 'left', clip: leftClip, border: leftBorder, perimeter: 312 },
-      { id: 'right', clip: rightClip, border: rightBorder, perimeter: 312 }
+      { id: 'top', clip: topClip, border: topBorder, perimeter: 386 },
+      { id: 'bottom', clip: botClip, border: botBorder, perimeter: 386 },
+      { id: 'left', clip: leftClip, border: leftBorder, perimeter: 193 },
+      { id: 'right', clip: rightClip, border: rightBorder, perimeter: 193 }
     );
   } else if (currentShape === 'circle') {
     // 2 independent pieces: top and bottom half-circles
