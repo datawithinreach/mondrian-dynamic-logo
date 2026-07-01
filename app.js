@@ -183,7 +183,7 @@ function playTransition(canvas, targetLayout) {
     canvas.svg.style.backgroundColor = themeColors.white;
 
     // Determine viewBox & root elements
-    const isLockup = canvas.id === 'text' || canvas.id === 'geom';
+    const isLockup = canvas.id === 'text';
     canvas.svg.setAttribute('viewBox', isLockup ? '-4 -4 1056 264' : '-4 -4 264 264');
 
     // Setup Clipping Defs
@@ -223,6 +223,41 @@ function playTransition(canvas, targetLayout) {
       clipPath.appendChild(rect);
     }
     defs.appendChild(clipPath);
+
+    if (canvas.id === 'geom') {
+      const splitClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+      splitClip.setAttribute('id', `clip-split-${canvas.id}-${now}`);
+      if (currentShape === 'rhombus') {
+        // 4 pieces: top, bottom, left, right triangles
+        const poly1 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        poly1.setAttribute('points', '128,0 176,48 80,48');
+        const poly2 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        poly2.setAttribute('points', '128,256 176,208 80,208');
+        const poly3 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        poly3.setAttribute('points', '0,128 48,80 48,176');
+        const poly4 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        poly4.setAttribute('points', '256,128 208,80 208,176');
+        splitClip.appendChild(poly1);
+        splitClip.appendChild(poly2);
+        splitClip.appendChild(poly3);
+        splitClip.appendChild(poly4);
+      } else {
+        // Circle or Rectangle: top and bottom halves with an 80px gap in the middle
+        const rect1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect1.setAttribute('x', '0');
+        rect1.setAttribute('y', '0');
+        rect1.setAttribute('width', '256');
+        rect1.setAttribute('height', '88');
+        const rect2 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect2.setAttribute('x', '0');
+        rect2.setAttribute('y', '168');
+        rect2.setAttribute('width', '256');
+        rect2.setAttribute('height', '88');
+        splitClip.appendChild(rect1);
+        splitClip.appendChild(rect2);
+      }
+      defs.appendChild(splitClip);
+    }
     canvas.svg.appendChild(defs);
 
     // Group for logo drawing (with translation & scale if inside a lockup)
@@ -235,6 +270,15 @@ function playTransition(canvas, targetLayout) {
 
     const logoG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     logoG.setAttribute('clip-path', `url(#clip-${canvas.id}-${now})`);
+    
+    // Nest inner group with split clip-path if we are in Configuration 4
+    let drawG = logoG;
+    if (canvas.id === 'geom') {
+      const splitG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      splitG.setAttribute('clip-path', `url(#clip-split-${canvas.id}-${now})`);
+      logoG.appendChild(splitG);
+      drawG = splitG;
+    }
     
     if (isLockup) {
       logoG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
@@ -283,7 +327,7 @@ function playTransition(canvas, targetLayout) {
         rect.setAttribute('fill', fillVal);
         rect.setAttribute('fill-opacity', fillOpacity);
         rect.setAttribute('stroke', 'none');
-        logoG.appendChild(rect);
+        drawG.appendChild(rect);
       });
     }
 
@@ -308,7 +352,7 @@ function playTransition(canvas, targetLayout) {
         line.setAttribute('stroke', themeColors.black);
         line.setAttribute('stroke-width', currentStrokeWidth);
         line.setAttribute('stroke-linecap', 'butt');
-        logoG.appendChild(line);
+        drawG.appendChild(line);
       });
     }
 
@@ -355,12 +399,14 @@ function playTransition(canvas, targetLayout) {
         borderG.setAttribute('transform', 'translate(40, 89.6) scale(0.3)');
         borderG.appendChild(border);
         containerG.appendChild(borderG);
+      } else if (canvas.id === 'geom') {
+        drawG.appendChild(border);
       } else {
         canvas.svg.appendChild(border);
       }
     }
 
-    // D. If lockup, render wordmark (Standard Oswald typography for 'text' or custom geometric for 'geom')
+    // D. If lockup, render wordmark (Standard Oswald typography for 'text')
     if (isLockup) {
       if (canvas.id === 'text') {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -375,40 +421,6 @@ function playTransition(canvas, targetLayout) {
         text.setAttribute('alignment-baseline', 'middle');
         text.textContent = 'DATA WITHIN REACH';
         containerG.appendChild(text);
-      } else if (canvas.id === 'geom') {
-        const geomG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        geomG.setAttribute('transform', 'translate(360, 89.6) scale(0.3)');
-        
-        const pathD = [
-          // DATA
-          "M 0,32 L 0,224 L 48,224 L 64,208 L 64,48 L 48,32 Z", // D
-          "M 80,224 L 80,80 L 112,32 L 144,80 L 144,224 M 80,128 L 144,128", // A
-          "M 160,32 L 256,32 M 192,32 L 192,224", // T
-          "M 224,224 L 224,80 L 248,56 L 272,80 L 272,224 M 224,144 L 272,144", // A
-
-          // WITHIN
-          "M 320,32 L 320,224 L 344,128 L 368,224 L 368,32", // W + I
-          "M 368,32 L 424,32 M 396,32 L 396,224", // T
-          "M 424,32 L 424,224 M 424,128 L 472,128 M 472,32 L 472,224", // H
-          "M 496,224 L 496,32 L 544,224 L 544,32", // I + N
-
-          // REACH
-          "M 592,224 L 592,32 L 632,32 L 640,48 L 640,112 L 632,128 L 592,128 M 616,128 L 640,224", // R
-          "M 704,32 L 664,32 L 664,224 L 704,224 M 664,128 L 696,128", // E
-          "M 696,200 L 696,80 L 712,48 L 728,80 L 728,200 M 696,128 L 728,128", // A (tucked)
-          "M 792,32 L 752,32 L 752,224 L 792,224", // C
-          "M 816,32 L 816,224 M 816,128 L 856,128 M 856,32 L 856,224" // H
-        ].join(' ');
-
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathD);
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', themeColors.black);
-        path.setAttribute('stroke-width', '15'); // Matches visual weight of logo grid lines
-        path.setAttribute('stroke-linecap', 'square');
-        path.setAttribute('stroke-linejoin', 'miter');
-        geomG.appendChild(path);
-        containerG.appendChild(geomG);
       }
 
       // Auto-crop viewBox to wrap the bounding box tightly with a 16px safety padding (eliminates wasted canvas space)
@@ -423,11 +435,12 @@ function playTransition(canvas, targetLayout) {
       }
     }
 
-    // E. If monogram, render centered uppercase monogram "DWR" with crisp drop shadow (dx=2, dy=2)
-    if (canvas.id === 'monogram') {
+    // E. If monogram or split shape monogram, render centered uppercase monogram "DWR" with crisp drop shadow (dx=2, dy=2)
+    if (canvas.id === 'monogram' || canvas.id === 'geom') {
       const isDark = currentTheme === 'dark';
       const shadowColor = isDark ? '#121318' : '#ffffff';
       const frontColor = isDark ? '#dccaa0' : '#111112';
+      const fontSize = canvas.id === 'geom' ? '84' : '110';
 
       // 1. Draw drop shadow text first (offset by dx=2, dy=2)
       const shadowText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -436,7 +449,7 @@ function playTransition(canvas, targetLayout) {
       shadowText.setAttribute('dy', '10'); // 8 + 2 vertical offset
       shadowText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
       shadowText.setAttribute('font-weight', '300'); // Oswald Light
-      shadowText.setAttribute('font-size', '110'); // Fitted size
+      shadowText.setAttribute('font-size', fontSize);
       shadowText.setAttribute('fill', shadowColor);
       shadowText.setAttribute('text-anchor', 'middle');
       shadowText.setAttribute('alignment-baseline', 'middle');
@@ -450,7 +463,7 @@ function playTransition(canvas, targetLayout) {
       frontText.setAttribute('dy', '8');
       frontText.setAttribute('font-family', "'Oswald', -apple-system, sans-serif");
       frontText.setAttribute('font-weight', '300'); // Oswald Light
-      frontText.setAttribute('font-size', '110');
+      frontText.setAttribute('font-size', fontSize);
       frontText.setAttribute('fill', frontColor);
       frontText.setAttribute('text-anchor', 'middle');
       frontText.setAttribute('alignment-baseline', 'middle');
@@ -669,28 +682,28 @@ function init() {
       let suffix = 'standalone';
       if (canv.id === 'text') suffix = 'brand_lockup';
       else if (canv.id === 'monogram') suffix = 'monogram';
-      else if (canv.id === 'geom') suffix = 'geometric';
+      else if (canv.id === 'geom') suffix = 'split_monogram';
       exportSvg(canv, `data_within_reach_${suffix}.svg`);
     });
     canv.btnExportPng512.addEventListener('click', () => {
       let suffix = 'standalone';
       if (canv.id === 'text') suffix = 'brand_lockup';
       else if (canv.id === 'monogram') suffix = 'monogram';
-      else if (canv.id === 'geom') suffix = 'geometric';
+      else if (canv.id === 'geom') suffix = 'split_monogram';
       exportPng(canv, `data_within_reach_${suffix}_512.png`, 512);
     });
     canv.btnExportPng1024.addEventListener('click', () => {
       let suffix = 'standalone';
       if (canv.id === 'text') suffix = 'brand_lockup';
       else if (canv.id === 'monogram') suffix = 'monogram';
-      else if (canv.id === 'geom') suffix = 'geometric';
+      else if (canv.id === 'geom') suffix = 'split_monogram';
       exportPng(canv, `data_within_reach_${suffix}_1024.png`, 1024);
     });
     canv.btnExportPng2048.addEventListener('click', () => {
       let suffix = 'standalone';
       if (canv.id === 'text') suffix = 'brand_lockup';
       else if (canv.id === 'monogram') suffix = 'monogram';
-      else if (canv.id === 'geom') suffix = 'geometric';
+      else if (canv.id === 'geom') suffix = 'split_monogram';
       exportPng(canv, `data_within_reach_${suffix}_2048.png`, 2048);
     });
   });
